@@ -61,7 +61,7 @@ Plugin availability depends on your plan, workspace settings, and which features
 3. The first question asks whether you are starting a new household record or joining one that your spouse, partner, or another household member already set up.
 
    - **Starting a new record:** continue to the next step.
-   - **Joining an existing record:** first, ask the person who set it up to share the `Personal CFO Data` Google Drive folder with your Google account. Then ask them for that folder's Google Drive folder ID and paste it when Personal CFO asks for it. That is all this setup path needs: it uses the established record rather than connecting your accounts or creating a duplicate.
+   - **Joining an existing record:** ask the person who manages the household's budget and financial information to share that Google Drive folder with your Google account. Then paste its Google Drive link or folder ID when Personal CFO asks. That is all this setup path needs: it uses the established record rather than connecting your accounts or creating a duplicate.
 4. For a new household record, Setup moves directly into the data connection: connect Finances and Google Drive, then choose where to store the record:
 
    - **Create a Personal CFO Data folder for me**, or

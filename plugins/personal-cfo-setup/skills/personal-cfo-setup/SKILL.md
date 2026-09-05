@@ -22,11 +22,11 @@ Before creating anything, ask: "Is this a brand-new Personal CFO setup for your 
 
 For a new household setup, continue with the normal setup flow.
 
-For an existing household setup, stop creation work and ask for the Google Drive folder ID of the shared `Personal CFO Data` folder. Before continuing, have the folder owner share that folder with the joining user's Google account. The existing household member can find the folder ID in the shared-folder link. Confirm that it is the intended household record before reading it. Use that folder ID as the source for Personal CFO queries. Preserve its existing workbook, history, manual entries, and folder structure; do not create a second record, replace the baseline, or rerun first-time setup over it.
+For an existing household setup, stop creation work and ask: "Where does your household keep its budget and financial information?" Have the person who manages that information share its Google Drive folder with the joining user's Google account, then ask for the folder's Google Drive link or folder ID. Confirm that it is the intended household record before reading it. Use that folder ID as the source for Personal CFO queries. Preserve its existing workbook, history, manual entries, and folder structure; do not create a second record, replace the baseline, or rerun first-time setup over it.
 
 Create or update one native Google Doc in that folder named `Personal CFO Home`. It contains only the folder ID and folder URL, labeled as the active Personal CFO location. This is the persistent locator that other Personal CFO plugins use in future chats.
 
-Once the folder ID and locator are confirmed, integration is complete. Do not ask the joining user to connect Finances, run `financial-warehouse-sync`, create a folder, or complete the first-time setup questions. Explain any limitation if their Google Drive account cannot access the shared folder.
+Once the folder ID and locator are confirmed, integration is complete. Do not ask the joining user to connect Finances, run the first-time sync, create a folder, or complete the first-time setup questions. Explain any limitation if their Google Drive account cannot access the shared folder.
 
 ### 2. Connect only what is needed
 
@@ -57,7 +57,7 @@ Before reading account-specific facts, summarize the intended handoff: the selec
 
 This step is for a new household setup only, after the user has connected their accounts and chosen the Drive folder.
 
-Invoke the bundled `financial-warehouse-sync` skill. It is responsible for safely discovering or creating the canonical Drive workbook, importing the available history, preserving manual values and stale-but-known facts, and verifying the result.
+Read and follow [financial-warehouse-sync.md](references/financial-warehouse-sync.md). It is responsible for safely discovering or creating the canonical Drive workbook, importing the available history, preserving manual values and stale-but-known facts, and verifying the result.
 
 Do not turn its technical checkpoints into user tasks. If it reports a blocking ambiguity, translate it clearly. Example: "I found two possible Personal CFO folders. To avoid putting information in the wrong place, please choose the one you want to use."
 

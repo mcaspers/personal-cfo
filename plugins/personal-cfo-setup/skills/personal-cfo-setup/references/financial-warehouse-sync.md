@@ -1,8 +1,3 @@
----
-name: financial-warehouse-sync
-description: Safely synchronize Finances into the canonical Google Sheets Financial Data Warehouse using preflight validation, dry-run reconciliation, idempotent upserts, append-only snapshots, source-aware stale data handling, and auditable checkpoints.
----
-
 # Financial Warehouse Sync — Hardened v2
 
 ## Canonical destination
