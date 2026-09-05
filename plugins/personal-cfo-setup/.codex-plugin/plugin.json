@@ -1,0 +1,21 @@
+{
+  "name": "personal-cfo-setup",
+  "version": "0.1.0",
+  "description": "Guides a household through creating a private, source-aware financial record and first financial check-in.",
+  "author": {
+    "name": "mcaspers"
+  },
+  "license": "MIT",
+  "keywords": ["personal finance", "onboarding", "financial data", "household"],
+  "skills": "./skills/",
+  "interface": {
+    "displayName": "Personal CFO Setup",
+    "shortDescription": "Set up your private financial home base.",
+    "longDescription": "Connect your accounts and Drive, create a private financial record you control, and receive your first financial check-in.",
+    "developerName": "mcaspers",
+    "category": "Productivity",
+    "capabilities": [],
+    "defaultPrompt": ["Set up my Personal CFO and create my first financial check-in."]
+  },
+  "apps": "./.app.json"
+}

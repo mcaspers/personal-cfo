@@ -1,0 +1,19 @@
+{
+  "name": "personal-cfo-investment-options",
+  "version": "0.1.0",
+  "description": "Creates a household investment strategy options memo without executing trades or giving individualized orders.",
+  "author": { "name": "mcaspers" },
+  "license": "MIT",
+  "keywords": ["personal finance", "investing", "decision support"],
+  "skills": "./skills/",
+  "apps": "./.app.json",
+  "interface": {
+    "displayName": "Personal CFO Investment Options",
+    "shortDescription": "Compare investment strategy options and tradeoffs.",
+    "longDescription": "Analyzes goals, holdings, costs, and risk tradeoffs without providing executable trade instructions.",
+    "developerName": "mcaspers",
+    "category": "Productivity",
+    "capabilities": [],
+    "defaultPrompt": ["Prepare an investment strategy options memo for my household."]
+  }
+}

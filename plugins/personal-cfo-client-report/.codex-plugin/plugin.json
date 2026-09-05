@@ -1,0 +1,19 @@
+{
+  "name": "personal-cfo-client-report",
+  "version": "0.1.0",
+  "description": "Generates a source-labeled household financial report from connected financial and Drive sources.",
+  "author": { "name": "mcaspers" },
+  "license": "MIT",
+  "keywords": ["personal finance", "household", "reporting"],
+  "skills": "./skills/",
+  "apps": "./.app.json",
+  "interface": {
+    "displayName": "Personal CFO Report",
+    "shortDescription": "Create a household financial report.",
+    "longDescription": "Produces a source-labeled report covering cash flow, debt, net worth, protection, benefits, investments, and planning notes.",
+    "developerName": "mcaspers",
+    "category": "Productivity",
+    "capabilities": [],
+    "defaultPrompt": ["Create my quarterly Personal CFO report from my connected data."]
+  }
+}

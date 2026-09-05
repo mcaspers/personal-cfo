@@ -1,0 +1,104 @@
+{
+  "name": "personal-cfo",
+  "interface": {
+    "displayName": "Personal CFO"
+  },
+  "plugins": [
+    {
+      "name": "personal-cfo-data-layer",
+      "source": {
+        "source": "local",
+        "path": "./plugins/personal-cfo-data-layer"
+      },
+      "policy": {
+        "installation": "AVAILABLE",
+        "authentication": "ON_INSTALL"
+      },
+      "category": "Productivity"
+    },
+    {
+      "name": "personal-cfo-client-report",
+      "source": {
+        "source": "local",
+        "path": "./plugins/personal-cfo-client-report"
+      },
+      "policy": {
+        "installation": "AVAILABLE",
+        "authentication": "ON_INSTALL"
+      },
+      "category": "Productivity"
+    },
+    {
+      "name": "personal-cfo-client-review",
+      "source": {
+        "source": "local",
+        "path": "./plugins/personal-cfo-client-review"
+      },
+      "policy": {
+        "installation": "AVAILABLE",
+        "authentication": "ON_INSTALL"
+      },
+      "category": "Productivity"
+    },
+    {
+      "name": "personal-cfo-financial-plan",
+      "source": {
+        "source": "local",
+        "path": "./plugins/personal-cfo-financial-plan"
+      },
+      "policy": {
+        "installation": "AVAILABLE",
+        "authentication": "ON_INSTALL"
+      },
+      "category": "Productivity"
+    },
+    {
+      "name": "personal-cfo-portfolio-review",
+      "source": {
+        "source": "local",
+        "path": "./plugins/personal-cfo-portfolio-review"
+      },
+      "policy": {
+        "installation": "AVAILABLE",
+        "authentication": "ON_INSTALL"
+      },
+      "category": "Productivity"
+    },
+    {
+      "name": "personal-cfo-investment-options",
+      "source": {
+        "source": "local",
+        "path": "./plugins/personal-cfo-investment-options"
+      },
+      "policy": {
+        "installation": "AVAILABLE",
+        "authentication": "ON_INSTALL"
+      },
+      "category": "Productivity"
+    },
+    {
+      "name": "personal-cfo-tax-review",
+      "source": {
+        "source": "local",
+        "path": "./plugins/personal-cfo-tax-review"
+      },
+      "policy": {
+        "installation": "AVAILABLE",
+        "authentication": "ON_INSTALL"
+      },
+      "category": "Productivity"
+    },
+    {
+      "name": "personal-cfo-setup",
+      "source": {
+        "source": "local",
+        "path": "./plugins/personal-cfo-setup"
+      },
+      "policy": {
+        "installation": "AVAILABLE",
+        "authentication": "ON_INSTALL"
+      },
+      "category": "Productivity"
+    }
+  ]
+}
