@@ -8,6 +8,8 @@ Use connected data for current balances, transactions, recurring activity, debts
 
 ## Data-source bridge
 
+Resolve the Personal CFO folder from an ID or Drive link the user gave in this chat. If none was provided, search connected Google Drive for the exact native Google Doc named `Personal CFO Home`, read its active folder ID, and verify the document belongs to that folder. If no valid locator exists, or more than one valid locator exists, ask the user to identify the intended folder. Do not guess.
+
 Use the user's identified Google Drive transactional-data folder as the financial-data fallback and handoff. Read the latest dated `Financial Warehouse Sync - YYYY-MM-DD` for current balances, transactions, recurring streams, liabilities, and holdings; use `Financial Data Warehouse` for normalized history and snapshots. Check `Sources`, `Sync_State`, and relevant `*_as_of` or `observed_at` fields. Separate warehouse facts from user-provided planning assumptions. Preserve stale, manual, or unsupported-provider values and model uncertainty explicitly.
 
 Before building the balance sheet or scenarios, present the warehouse export date, covered period, provider list, and connector warnings and ask the user to confirm its origin. Do not treat the warehouse as the user's data source until confirmed in the current thread.

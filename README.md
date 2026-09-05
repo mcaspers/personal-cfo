@@ -62,11 +62,12 @@ Plugin availability depends on your plan, workspace settings, and which features
 
    - **Starting a new record:** continue to the next step.
    - **Joining an existing record:** first, ask the person who set it up to share the `Personal CFO Data` Google Drive folder with your Google account. Then ask them for that folder's Google Drive folder ID and paste it when Personal CFO asks for it. That is all this setup path needs: it uses the established record rather than connecting your accounts or creating a duplicate.
-4. For a new household record, when asked where to store it, choose either:
+4. For a new household record, Setup moves directly into the data connection: connect Finances and Google Drive, then choose where to store the record:
 
    - **Create a Personal CFO Data folder for me**, or
    - **Use an existing Google Drive folder**.
-5. Review the summary. It will tell you what accounts and history it found, what needs reconnecting, and what it could not find.
+5. Setup runs the initial financial-data sync and creates a small Google Drive document called `Personal CFO Home` in that folder. This stores the folder location only—no account information—and lets every other Personal CFO plugin find the same record in future chats.
+6. Review the summary. It will tell you what accounts and history it found, what needs reconnecting, and whether the shared Personal CFO location is ready for the other plugins.
 
 That is it. Your private financial record is stored in your Google Drive, and you can return later for a fuller review, report, plan, portfolio review, or tax-preparation worksheet.
 

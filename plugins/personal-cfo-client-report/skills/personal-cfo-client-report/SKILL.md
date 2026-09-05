@@ -8,6 +8,8 @@ Create a monthly, quarterly, annual, or custom household report. Confirm the per
 
 ## Data-source bridge
 
+Resolve the Personal CFO folder from an ID or Drive link the user gave in this chat. If none was provided, search connected Google Drive for the exact native Google Doc named `Personal CFO Home`, read its active folder ID, and verify the document belongs to that folder. If no valid locator exists, or more than one valid locator exists, ask the user to identify the intended folder. Do not guess.
+
 Use the user's explicitly identified Google Drive transactional-data folder as the financial-data handoff. Prefer the latest dated `Financial Warehouse Sync - YYYY-MM-DD` export for the requested period and use `Financial Data Warehouse` for historical and normalized data. Check `Sync_State`, `Sources`, and source `observed_at` or `*_as_of` fields before reporting freshness. Label these values as Drive-sourced, connector-reported data. If a source is login-required or stale, show it as a limitation rather than filling the gap with an assumption.
 
 Before using the warehouse in a report, show a brief provenance summary—export date, covered period, providers, and connector-status warnings—and ask the user to confirm its origin. Proceed without asking again only when that confirmation already exists in the current thread.

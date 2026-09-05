@@ -8,6 +8,8 @@ Use connected financial sources for current accounts, balances, transactions, re
 
 ## Financial-data warehouse bridge
 
+Resolve the Personal CFO folder from an ID or Drive link the user gave in this chat. If none was provided, search connected Google Drive for the exact native Google Doc named `Personal CFO Home`, read its active folder ID, and verify the document belongs to that folder. If no valid locator exists, or more than one valid locator exists, ask the user to identify the intended folder. Do not guess.
+
 The user's financial handoff must come from a Google Drive folder they explicitly identify. Before analysis, inspect that folder and use the newest active native Google Sheet named `Financial Data Warehouse` as the canonical warehouse. Also locate the newest dated `Financial Warehouse Sync - YYYY-MM-DD` sheet as the latest export snapshot. Do not rely on a global title search when a folder-scoped lookup is available.
 
 ### Provenance confirmation gate
