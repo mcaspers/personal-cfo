@@ -6,6 +6,12 @@ Personal CFO helps you organize your household finances in one private place, th
 >
 > Use it to centralize information, see it more clearly, and work with it more productively. It does not recommend or execute trades, move money, file taxes, or make decisions for you. Always verify important information and seek advice from a qualified professional before acting on a financial, tax, legal, insurance, or accounting matter.
 
+## Privacy and your ChatGPT plan
+
+Personal CFO works with sensitive household information. On a personal ChatGPT workspace (Free, Plus, or Pro), OpenAI says data sharing for model training is enabled by default, but you can opt out: go to **Settings → Data Controls → Improve the model for everyone** and turn it off. The setting applies to new conversations, so do this before using Personal CFO. Follow OpenAI’s step-by-step instructions: [How to stop chats from training ChatGPT](https://help.openai.com/en/articles/7730893-data-control).
+
+If you want a workspace where OpenAI does not use your inputs and outputs to train its models by default, consider **ChatGPT Business**. It includes additional workspace controls and is designed for teams of 2–200. At publication, a Business Standard seat is listed at $20 per person per month when billed annually or $25 when billed monthly; check OpenAI’s [Business pricing page](https://openai.com/business/pricing/) for current pricing, availability, and terms.
+
 ## Start here — no technical experience needed
 
 You should not need to use a terminal, GitHub, or code to use Personal CFO.
