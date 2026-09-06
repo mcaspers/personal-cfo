@@ -51,9 +51,9 @@ Before creating a folder, look in the selected Drive location for an active fold
 - If more than one exists, stop and ask which one is the household's active record. Prefer the folder that already contains `Personal CFO Home` or `Financial Data Warehouse`, but do not choose or delete a folder silently.
 - If Setup created an empty duplicate during the current chat, identify the chosen authoritative folder, then ask for explicit permission before moving that empty duplicate to Trash. Never delete a folder that contains files, a worksheet, or a `Personal CFO Home` locator.
 
-If the user chooses an existing folder, ask them to select or link it. If they choose a new folder, confirm that it will contain a spreadsheet named `Financial Data Warehouse` plus their supporting records. Do not expose IDs or require the user to edit configuration.
+If the user chooses an existing folder, ask them to select or link it. If they choose a new folder, confirm that it will contain a `Transactional Data` folder with a spreadsheet named `Financial Data Warehouse`, plus their supporting records. Do not expose IDs or require the user to edit configuration.
 
-Then ask: "Do you already have a Google Sheet you want to use as your financial record?" If yes, ask them to share or paste its Google Sheet link and confirm it belongs in the selected folder. If no, explain that Setup will create `Financial Data Warehouse` in that folder.
+Then ask: "Do you already have a Google Sheet you want to use as your financial record?" If yes, ask them to share or paste its Google Sheet link and confirm it belongs in the selected folder's `Transactional Data` folder. If no, explain that Setup will create `Financial Data Warehouse` there.
 
 ### 4. Confirm the private location
 
@@ -61,15 +61,7 @@ This step is for a new household setup only.
 
 Before creating files, summarize the selected Drive location and whether the user chose a new or existing Google Sheet. Ask for confirmation that it is their intended household location. Reuse confirmation already given in the same thread.
 
-### 5. Create the private financial home
-
-This step is for a new household setup only, after the user has connected Google Drive and chosen the Drive folder.
-
-Use the selected top-level folder as the household's private location. When the user supplied a Google Sheet, verify that it is a live Google Sheet inside that folder and preserve it. When no Sheet was supplied, create one native Google Sheet named `Financial Data Warehouse` in that folder. Verify the sheet's parent folder and active status.
-
-Do not retrieve, analyze, or import financial-account data in this desktop setup. Leave a newly created sheet ready for the separate web sync skill to initialize and populate.
-
-### 6. Create a simple document home
+### 5. Create a simple document home
 
 Inside the selected top-level folder, create these folders only when they do not already exist. Preserve any existing folders and organization.
 
@@ -84,6 +76,14 @@ Explain in plain language: "You can upload copies of the financial documents you
 
 Do not ask the user to upload passwords, account credentials, or documents they do not want stored in Drive. Do not move or rename existing user files without permission.
 
+### 6. Create the private financial home
+
+This step is for a new household setup only, after the user has connected Google Drive and chosen the Drive folder.
+
+Use the selected top-level folder as the household's private location and use its `Transactional Data` subfolder as the financial-data location. When the user supplied a Google Sheet, verify that it is a live Google Sheet inside `Transactional Data` and preserve it. When no Sheet was supplied, create one native Google Sheet named `Financial Data Warehouse` inside `Transactional Data`. Verify the sheet's parent folder and active status.
+
+Do not retrieve, analyze, or import financial-account data in this desktop setup. Leave a newly created sheet ready for the separate web sync skill to initialize and populate.
+
 ### 7. Create the Personal CFO Home locator
 
 After the Drive location and spreadsheet are resolved, create or update one native Google Doc inside the selected top-level budget-and-financial-information folder named `Personal CFO Home`. It contains only:
@@ -91,7 +91,7 @@ After the Drive location and spreadsheet are resolved, create or update one nati
 - `Active Personal CFO folder ID: <folder ID>`
 - `Active Personal CFO folder URL: <folder URL>`
 
-Verify the document is in the selected top-level folder. This locator is not a financial report and must not contain balances, transactions, account numbers, or credentials. Future Personal CFO plugins resolve this exact document when the folder is not already identified in the current chat. That resolved folder is their working scope for the household's warehouse, uploaded files, and supporting documents.
+Verify the document is in the selected top-level folder. This locator is not a financial report and must not contain balances, transactions, account numbers, or credentials. It is the durable grounding document that future Personal CFO plugins resolve when a chat does not already identify the household location. Tell the user not to delete it. That resolved top-level folder is their working scope; its `Transactional Data` subfolder contains the warehouse, while the other subfolders hold uploaded supporting documents.
 
 ### 8. Hand off the first live sync to ChatGPT on the web
 

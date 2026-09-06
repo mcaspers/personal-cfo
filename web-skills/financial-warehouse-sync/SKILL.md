@@ -11,9 +11,9 @@ This is an upload-ready ChatGPT web skill for the first and later live imports o
 
 ## Setup prerequisite
 
-Run **Personal CFO Setup** before using this skill. This skill expects one existing household foundation: an active top-level Personal CFO folder, a `Personal CFO Home` locator (or a folder link supplied in the current chat), and one native Google Sheet named `Financial Data Warehouse` in that folder. Setup may also have created document folders for transactional records, benefits and insurance, debt, legal records, investments, property, and vehicles.
+Run **Personal CFO Setup** before using this skill. This skill expects one existing household foundation: an active top-level Personal CFO folder, a `Personal CFO Home` locator (or a folder link supplied in the current chat), and one native Google Sheet named `Financial Data Warehouse` inside its `Transactional Data` folder. Setup may also have created folders for benefits and insurance, debt, legal records, investments, property, and vehicles.
 
-This skill is a live-data importer, not a folder or workbook setup tool. Preserve the existing household structure. If the required location, locator, or worksheet cannot be resolved, stop and direct the user back to Personal CFO Setup; do not create a new folder, locator, or replacement workbook.
+`Personal CFO Home` is the household's durable grounding document. Preserve it in the top-level folder; do not delete, move, or overwrite it. This skill is a live-data importer, not a folder or workbook setup tool. Preserve the existing household structure. If the required location, locator, `Transactional Data` folder, or worksheet cannot be resolved, stop and direct the user back to Personal CFO Setup; do not create a new folder, locator, or replacement workbook.
 
 ## Required readiness check and confirmation gate
 
@@ -23,11 +23,17 @@ Report the result in plain language without displaying account numbers, balances
 
 Do not create, initialize, modify, or populate the workbook until the user gives an explicit affirmative answer in this web chat. A confirmation given earlier to the desktop setup plugin does not satisfy this gate.
 
+### Scheduled monthly runs
+
+For a scheduled ChatGPT task, the task's saved instruction may serve as the explicit confirmation only when it clearly authorizes a recurring, non-destructive sync into the existing `Financial Data Warehouse` resolved through `Personal CFO Home` and `Transactional Data`. Perform the same read-only Finances and Drive checks first. If either connection is unavailable, the location is ambiguous, the worksheet is missing, or the worksheet does not have the expected parent folder, do not write; report the condition for the user to resolve.
+
+Never infer recurring write permission from a generic reminder, a desktop-setup confirmation, or an earlier chat. A scheduled task must never create a replacement folder or workbook.
+
 If Finances is not connected, has not finished syncing, or cannot return a read-only availability check, stop and tell the user to finish or wait for the Finances sync. Do not write an empty financial import and do not describe the record as ready. If Drive cannot resolve exactly one intended folder and workbook, stop and ask the user for its link.
 
 ## Resolve the setup-created location
 
-Prefer a folder or spreadsheet link supplied in the current chat. Otherwise, look for the exact native Google Doc `Personal CFO Home` in the selected household folder and read its active-folder location. Treat that top-level folder as the only scope for the warehouse, uploaded files, and supporting documents. Do not search globally for similarly named folders.
+Prefer a folder or spreadsheet link supplied in the current chat. Otherwise, look for the exact native Google Doc `Personal CFO Home` in the selected household folder and read its active-folder location. Treat that top-level folder as the only scope for uploaded files and supporting documents. Resolve its exact `Transactional Data` subfolder as the only scope for the warehouse. Do not search globally for similarly named folders.
 
 ## Canonical destination
 
@@ -37,7 +43,7 @@ Spreadsheet URL:
 `https://docs.google.com/spreadsheets/d//edit`
 
 Expected warehouse schema version: `v2`.
-Current sync skill version: `v2.4-portable`.
+Current sync skill version: `v2.5-portable`.
 
 Never create a replacement workbook during a normal sync.
 Never accept a trashed warehouse as canonical.
@@ -50,7 +56,7 @@ This skill must not depend on any individual's spreadsheet IDs, folder IDs, inst
 
 Runtime configuration:
 - `warehouse_spreadsheet_id`: strongest identity when a canonical warehouse is already known;
-- `target_folder_id` or `target_folder_url`: required top-level household budget-and-financial-information folder selected during Setup;
+- `target_folder_id` or `target_folder_url`: required top-level household budget-and-financial-information folder selected during Setup; its `Transactional Data` subfolder is the warehouse location;
 - `warehouse_name`: defaults to `Financial Data Warehouse`.
 
 If no spreadsheet ID is configured, use setup-location discovery.
@@ -65,46 +71,46 @@ The skill supports first-run schema initialization for the empty canonical works
 
 ### Discovery after setup
 
-Before any sync, resolve the target folder **first**, then resolve the canonical warehouse **only within that folder**.
+Before any sync, resolve the target top-level folder **first**, then its exact `Transactional Data` subfolder, then resolve the canonical warehouse **only within that subfolder**.
 
 Target warehouse name:
 `Financial Data Warehouse`
 
 Discovery rules:
 
-1. Resolve exactly one active target folder.
+1. Resolve exactly one active top-level target folder and exactly one active `Transactional Data` subfolder.
    - Use the `target_folder_id` or `target_folder_url` supplied by Setup.
    - Exclude trashed folders.
-   - If it is absent, inaccessible, or ambiguous, **fail closed** and ask Setup to identify the household's top-level folder.
-2. If Setup supplies `warehouse_spreadsheet_id` or a Google Sheet URL, fetch that exact Sheet and verify that it is native Google Sheets, not trashed, and inside the resolved target folder. If valid, use it as the canonical warehouse and skip name-based discovery. If it is a new, uninitialized sheet created by Personal CFO Setup, initialize that exact sheet in place using the setup-created workbook schema contract before importing facts. If it fails any check, stop and explain the mismatch; do not silently choose or create another workbook.
-3. If Setup did not supply a Sheet, search only inside the resolved target folder for a native Google Sheet named exactly `Financial Data Warehouse`.
-   - Restrict by parent folder ID.
+   - If either is absent, inaccessible, or ambiguous, **fail closed** and ask Setup to identify or repair the household location.
+2. If Setup supplies `warehouse_spreadsheet_id` or a Google Sheet URL, fetch that exact Sheet and verify that it is native Google Sheets, not trashed, and inside the resolved `Transactional Data` folder. If valid, use it as the canonical warehouse and skip name-based discovery. If it is a new, uninitialized sheet created by Personal CFO Setup, initialize that exact sheet in place using the setup-created workbook schema contract before importing facts. If it fails any check, stop and explain the mismatch; do not silently choose or create another workbook.
+3. If Setup did not supply a Sheet, search only inside the resolved `Transactional Data` folder for a native Google Sheet named exactly `Financial Data Warehouse`.
+   - Restrict by the `Transactional Data` parent folder ID.
    - Restrict to native Google Sheets.
    - Require `trashed = false`.
    - Do **not** accept a global Drive search result that merely has the right title.
-4. If exactly one active matching warehouse exists inside the target folder, use it.
-5. If multiple active matching warehouses exist inside the target folder, **fail closed** and report an ambiguity.
-6. Separately check for same-named trashed warehouse candidates associated with the target folder.
+4. If exactly one active matching warehouse exists inside `Transactional Data`, use it.
+5. If multiple active matching warehouses exist inside `Transactional Data`, **fail closed** and report an ambiguity.
+6. Separately check for same-named trashed warehouse candidates associated with `Transactional Data`.
    - If an otherwise matching warehouse exists in Trash, **fail closed**.
    - Report that the existing warehouse must be restored or explicitly replaced.
    - Do not treat a trashed file as canonical.
    - Do not silently create a replacement while a same-named trashed warehouse exists.
 7. If warehouse lookup fails because of permissions, connector errors, unavailable Drive access, an unresolved folder, or no matching worksheet, stop and direct the user back to Personal CFO Setup. **Do not create a replacement.**
 
-Never create a second warehouse merely because a lookup timed out, returned an access error, or found a matching file outside the resolved target folder.
+Never create a second warehouse merely because a lookup timed out, returned an access error, or found a matching file outside the resolved `Transactional Data` folder.
 
 ### Folder handling
 
-Use the target folder selected during Setup. Do not search for or create another folder by name. If that folder is inaccessible or ambiguous, stop before initializing or syncing the workbook.
+Use the `Transactional Data` folder selected through the top-level location from Setup. Do not search for or create another folder by name. If either location is inaccessible or ambiguous, stop before initializing or syncing the workbook.
 
 ### Initializing the setup-created warehouse
 
 When first-run initialization is required, use the valid empty Sheet supplied or resolved from Personal CFO Setup. Never create a native Google Sheet from this skill.
 
-For the setup-created empty Sheet, preserve its identity and parent folder:
+For the setup-created empty Sheet, preserve its identity and `Transactional Data` parent folder:
 
 1. Re-read its Drive metadata and verify:
-   - its parent folder is the resolved target folder;
+   - its parent folder is the resolved `Transactional Data` folder;
    - it is not trashed;
    - its MIME type is native Google Sheets.
 2. If placement verification fails, stop. Do not initialize financial tables in a file whose destination is unresolved.
@@ -131,28 +137,32 @@ Do not create a simplified seven-tab demonstration workbook.
 
 ### Setup-created workbook schema contract
 
-Create the physical stable-key columns required by the current skill contract.
+For a new setup-created workbook, create the following exact v2 headers in the stated order. Do not substitute convenient aliases such as `currency`, `provider`, `net_balance`, or `raw_json` omissions. This is the canonical schema used by the established Personal CFO warehouse and keeps new households compatible with every downstream Personal CFO skill.
 
-At minimum:
+```text
+Transactions: transaction_id, item_id, account_id, account_name, date, authorized_date, name, merchant_name, amount, currency_code, pending, category_primary, category_detailed, transaction_type, payment_channel, location_json, source_as_of, observed_at, raw_json
+Metadata: key, value
+Sources: source_key, item_id, source_type, provider_name, institution_name, status, last_successful_update, last_error, coverage_state, coverage_availability, coverage_freshness, source_as_of, observed_at, provenance_json
+Accounts: account_id, item_id, source_key, institution_name, account_name, official_name, account_type, account_subtype, currency_code, mask, current_balance, available_balance, credit_limit, status, source_as_of, observed_at, provenance_json
+Balance_Snapshots: account_id, balance_as_of, source_type, current_balance, available_balance, credit_limit, currency_code, status, source_as_of, observed_at
+Asset_Snapshots: memory_id, asset_name, asset_type, value, currency_code, liability_balance, notes, snapshot_as_of, source_as_of, observed_at, raw_json
+Investment_Holdings: account_id, security_id, snapshot_as_of, security_name, ticker, type, quantity, price, value, cost_basis, currency_code, source_as_of, observed_at, raw_json
+Investment_Transactions: investment_transaction_id, account_id, security_id, date, name, type, subtype, quantity, amount, price, fees, currency_code, source_as_of, observed_at, raw_json
+Liabilities: account_id, snapshot_as_of, liability_type, current_balance, statement_balance, minimum_payment, payment_due_date, apr, interest_rate, escrow_balance, loan_term, origination_date, currency_code, source_as_of, observed_at, raw_json, liability_record_type, liability_coverage_status, linked_asset_id, linked_asset_memory_id
+Recurring_Streams: stream_id, account_name, item_id, account_id, flow_type, description, merchant_name, frequency, last_amount, average_amount, predicted_next_date, category_primary, category_detailed, is_active, source_as_of, observed_at, lifecycle_status, raw_json, normalized_average_amount, normalized_last_amount, cash_flow_normalization_status
+Data_Dictionary: sheet, column, description, key_role, mode, notes
+Sync_State: dataset, mode, stable_key, overlap_days, last_successful_sync, last_full_reconcile, schema_version, skill_version, migration_policy, checkpoint
+Sync_Runs: run_id, started_at, completed_at, mode, status, dataset, rows_read, rows_inserted, rows_updated, rows_unchanged, rows_marked_stale_or_inactive, error_summary, checkpoint, preflight_status, source_key_duplicates, destination_key_duplicates, skill_version, lock_expires_at, diff_hash, warehouse_schema_version, material_changed_fields
+```
 
-#### Transactions
-Must include `transaction_id`.
+Populate `Data_Dictionary` during initialization with one row for every managed physical column. It must not be left as a header-only tab.
 
-#### Sources
-Must include:
-- `source_key`
-- `item_id`
-- source/provider/status/provenance fields.
-
-Stable key: `source_key`.
-
-#### Accounts
-Must include:
-- `account_id`
-- `item_id`
-- account identity/status/provenance fields.
-
-Stable key: `account_id`.
+Stable keys:
+- `Transactions`: `transaction_id`
+- `Sources`: `source_key`
+- `Accounts`: `account_id`
+- `Investment_Transactions`: `investment_transaction_id`
+- `Recurring_Streams`: `stream_id`
 
 Manual accounts must still populate canonical `account_id` with their persistent manual identifier.
 
@@ -304,7 +314,8 @@ For a new warehouse:
 - `last_successful_sync` starts blank;
 - `last_full_reconcile` starts blank;
 - `schema_version` is `v2`;
-- `skill_version` is `v2.4-portable`.
+- `skill_version` is `v2.5-portable`.
+- `checkpoint` starts blank.
 
 ### Initialize Sync_Runs
 
@@ -320,6 +331,7 @@ Create the full v2 audit schema including:
 - `rows_inserted`
 - `rows_updated`
 - `rows_unchanged`
+- `rows_marked_stale_or_inactive`
 - `error_summary`
 - `checkpoint`
 - `preflight_status`
@@ -329,6 +341,7 @@ Create the full v2 audit schema including:
 - `lock_expires_at`
 - `diff_hash`
 - `warehouse_schema_version`
+- `material_changed_fields`
 
 ### First-run behavior
 
@@ -376,9 +389,9 @@ After the initial full reconciliation succeeds:
 Every successful run must be able to report:
 - canonical spreadsheet ID;
 - canonical spreadsheet URL;
-- resolved target folder ID or URL;
+- resolved top-level folder ID or URL and `Transactional Data` folder ID or URL;
 - confirmation that the warehouse is active (`trashed=false`);
-- confirmation that the warehouse parent matches the resolved target folder.
+- confirmation that the warehouse parent matches the resolved `Transactional Data` folder.
 
 If these conditions cannot be verified, the run must not report successful warehouse resolution.
 
@@ -390,7 +403,7 @@ Name-based discovery is only for initial resolution.
 
 If the caller/runtime can persist configuration, store:
 - spreadsheet ID;
-- target folder ID;
+- top-level target folder ID and `Transactional Data` folder ID;
 - schema version.
 
 On later runs, prefer the stored spreadsheet ID and verify it still resides in the intended folder.
@@ -463,6 +476,20 @@ Use Finances to retrieve:
 - investment holdings;
 - investment transactions;
 - liabilities.
+
+### Mandatory row-level ingestion
+
+For `Transactions`, `Investment_Transactions`, and `Recurring_Streams`, a CSV response is source data—not a completion report. Parse its header and every available data row, normalize it into the exact destination schema, compute the dry-run diff, and upsert the rows in the same run.
+
+For each CSV-derived dataset:
+
+1. Read the complete CSV payload or its bounded pages; retain provider IDs exactly as strings.
+2. Parse quoted fields, embedded commas, blank values, dates, timestamps, booleans, and numeric values correctly. Do not use a line split that corrupts quoted CSV fields.
+3. Map each source field to the exact destination header. Preserve the unmodified source record in `raw_json` when that column exists.
+4. Reject only the malformed rows whose stable key is blank or duplicated, record their count and reason in `Sync_Runs`, and continue with valid rows when the source coverage remains usable.
+5. Upsert every valid parsed row by its stable key. Re-read the written keys and verify the inserted/updated counts before advancing the checkpoint.
+
+It is never acceptable to report “retrieved as CSV but not imported” as a `partial` success for an otherwise readable dataset. If row-level parsing or writing cannot be completed, mark that dataset `failed`, leave its checkpoint unchanged, and state the concrete blocker. Do not claim the first full reconciliation succeeded while any of these three datasets is missing.
 
 Preserve stale-but-known provider state.
 
@@ -833,7 +860,7 @@ For current-state tables:
 Version the warehouse schema and the sync implementation independently.
 
 - `warehouse_schema_version` / `Sync_State.schema_version` = `v2`
-- current `skill_version` = `v2.4-portable`
+- current `skill_version` = `v2.5-portable`
 
 A skill-version change does not imply a warehouse schema migration.
 A warehouse schema version changes only when the physical/control-table contract changes incompatibly or requires a real schema migration.
@@ -854,6 +881,7 @@ Append one row per dataset per run with:
 - `rows_inserted`
 - `rows_updated`
 - `rows_unchanged`
+- `rows_marked_stale_or_inactive`
 - `error_summary`
 - `checkpoint`
 - `preflight_status`
@@ -863,6 +891,7 @@ Append one row per dataset per run with:
 - `lock_expires_at`
 - `diff_hash`
 - `warehouse_schema_version`
+- `material_changed_fields`
 
 Version fields:
 - `skill_version` records the exact sync-skill version that executed the run.
@@ -953,7 +982,7 @@ A full reconcile followed by an immediate near-no-op delta is the production-rea
 This portable skill is intended to work without source-code edits.
 
 A new user should:
-1. run Personal CFO Setup in the desktop app to create or identify the top-level household folder and spreadsheet;
+1. run Personal CFO Setup in the desktop app to create or identify the top-level household folder, its `Transactional Data` subfolder, and the spreadsheet;
 2. open ChatGPT on the web, connect/authorize Finances and Google Drive, and wait for Finances to finish syncing;
 3. upload and run this skill in the web app;
 4. provide the Personal CFO folder or spreadsheet link when asked;

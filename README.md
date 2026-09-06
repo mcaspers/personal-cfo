@@ -28,7 +28,8 @@ Plugin availability depends on your plan, workspace settings, and which features
 ### First, connect your apps
 
 1. In the **ChatGPT desktop app**, open the main **Plugins** tab and add **Google Drive**. Follow the normal Google sign-in steps to connect it.
-2. You will connect **Finances** later in ChatGPT on the web, immediately before the first live sync. Never enter a bank password into a ChatGPT conversation.
+2. On **ChatGPT on the web**, open **Plugins** and make sure **Google Drive** is enabled and connected there too. The Financial Warehouse Sync skill needs both the web version of Google Drive and Finances; a desktop-only Google Drive connection is not enough.
+3. You will connect **Finances** later in ChatGPT on the web, immediately before the first live sync. Never enter a bank password into a ChatGPT conversation.
 
 ### Add the Personal CFO marketplace
 
@@ -77,13 +78,34 @@ Plugin availability depends on your plan, workspace settings, and which features
 
    - **Create a Personal CFO Data folder for me**, or
    - **Use an existing Google Drive folder**.
-5. Setup reuses an existing `Personal CFO Data` folder if it finds one, so it does not create a second household record. It creates the spreadsheet, simple document folders, and a small Google Drive document called `Personal CFO Home` in the one active top-level folder. The folders are for transactional data, benefits and insurance, debt and credit, estate and legal records, investments and retirement, and property and vehicles. Upload copies of any documents you want available there now or later; they are not required for the first live-data sync.
-6. To import your live data, open [ChatGPT Finances on the web](https://chatgpt.com/finances), click **Connect Accounts**, and complete the secure connection screens for the accounts you want to include. Wait until Finances shows that account data has synced.
-7. In ChatGPT on the web, open **Skills** → **Create** → **Upload from your computer**. Download and upload [Financial Warehouse Sync](web-skills/financial-warehouse-sync.zip).
-8. Start a new web chat, run **Financial Warehouse Sync**, and say: `Sync my connected financial data into the Financial Data Warehouse in my Personal CFO folder.` Provide the folder or spreadsheet link if asked. The web skill first checks whether Finances is ready, then asks for your final confirmation before it writes anything.
-9. The web skill's completion summary tells you what data it found and whether the shared Personal CFO location is ready for the other plugins.
+5. Setup reuses an existing `Personal CFO Data` folder if it finds one, so it does not create a second household record. It creates simple document folders and a small Google Drive document called `Personal CFO Home` in the one active top-level folder. The folders are for transactional data, benefits and insurance, debt and credit, estate and legal records, investments and retirement, and property and vehicles. `Financial Data Warehouse` lives inside `Transactional Data`. Do **not** delete `Personal CFO Home`: it is the grounding document every Personal CFO plugin uses to find this household's shared financial home. Upload copies of any documents you want available there now or later; they are not required for the first live-data sync.
+6. Before syncing, open **Plugins** in ChatGPT on the web and confirm that **Google Drive** says it is connected. This is separate from the desktop connection and is required for the web skill to find and update your spreadsheet.
+7. To import your live data, open [ChatGPT Finances on the web](https://chatgpt.com/finances), click **Connect Accounts**, and complete the secure connection screens for the accounts you want to include. Wait until Finances shows that account data has synced.
+8. In ChatGPT on the web, open **Skills** → **Create** → **Upload from your computer**. Download and upload [Financial Warehouse Sync](web-skills/financial-warehouse-sync.zip).
+9. Start a new web chat, run **Financial Warehouse Sync**, and say: `Sync my connected financial data into the Financial Data Warehouse in my Personal CFO folder.` Provide the folder or spreadsheet link if asked. The web skill first checks whether Finances is ready, then asks for your final confirmation before it writes anything.
+10. The web skill's completion summary tells you what data it found and whether the shared Personal CFO location is ready for the other plugins.
 
 That is it. Your private financial record is stored in your Google Drive, and you can return later for a fuller review, report, plan, portfolio review, or tax-preparation worksheet.
+
+### Optional: refresh your data every month
+
+After the first sync succeeds, you can have ChatGPT refresh the existing warehouse automatically each month.
+
+1. In ChatGPT on the web, open [Scheduled](https://chatgpt.com/scheduled) and create a new task. Choose a time that works for you, such as the first day of each month at 9:00 AM.
+2. Confirm that **Google Drive** and **Finances** are still connected in ChatGPT on the web. A scheduled task cannot sync if either connection needs attention.
+3. Give the task a non-sensitive name such as `Monthly Personal CFO refresh`, then paste these instructions:
+
+   ```text
+   Every month, run Financial Warehouse Sync using my connected Finances and Google Drive. Resolve my active household location through Personal CFO Home. Synchronize only into the existing Financial Data Warehouse inside that location's Transactional Data folder.
+
+   I authorize this scheduled task to write my financial data only to that existing spreadsheet. Use the normal non-destructive delta sync: preserve manual records and stale last-known data, never treat a connector problem as zero, and never clear history or create a replacement folder or workbook. If Finances or Google Drive is unavailable, the destination is ambiguous, or the workbook is not in Transactional Data, do not write. Tell me what needs attention instead.
+
+   Report whether the sync succeeded, what data was updated, any connector warnings, and whether another full sync is recommended.
+   ```
+
+4. Review the task's instructions and schedule, then save it. Check its first result before relying on it.
+
+Do not put spreadsheet IDs, folder IDs, balances, account numbers, or other sensitive details in a scheduled task's name or instructions. `Personal CFO Home` lets the task find the right household location without them. You can review, pause, edit, or delete the task from [Scheduled](https://chatgpt.com/scheduled). See OpenAI's [Scheduled tasks guide](https://help.openai.com/en/articles/10291617) for current availability, limits, and notification settings.
 
 ## If you cannot find “Add a marketplace”
 
