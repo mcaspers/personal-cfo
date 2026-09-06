@@ -2,7 +2,9 @@
 
 Personal CFO helps you organize your household finances in one private place, then gives you a simple check-in: **what changed, what needs attention, and what you may want to do next.**
 
-It does not move money, make trades, file taxes, or replace a financial, tax, legal, insurance, or accounting professional.
+> **Important:** Personal CFO is a tool for organizing and exploring your own financial information. Its creator is not a financial professional, and nothing it produces is financial, investment, tax, legal, insurance, accounting, or other professional advice.
+>
+> Use it to centralize information, see it more clearly, and work with it more productively. It does not recommend or execute trades, move money, file taxes, or make decisions for you. Always verify important information and seek advice from a qualified professional before acting on a financial, tax, legal, insurance, or accounting matter.
 
 ## Start here — no technical experience needed
 
@@ -35,8 +37,14 @@ Plugin availability depends on your plan, workspace settings, and which features
    https://github.com/mcaspers/personal-cfo
    ```
 
-4. Add the marketplace. A new **Personal CFO** marketplace will appear in your Plugins list.
-5. Return to the main **Plugins** tab. Open the Personal CFO marketplace and click the **+** button beside each **Personal CFO** plugin you want to use. You must do this one plugin at a time. For a complete first test, add all of them:
+4. In the **Git ref** field, enter:
+
+   ```text
+   main
+   ```
+
+5. Add the marketplace. A new **Personal CFO** marketplace will appear in your Plugins list.
+6. Return to the main **Plugins** tab. Open the Personal CFO marketplace and click the **+** button beside each **Personal CFO** plugin you want to use. You must do this one plugin at a time. For a complete first test, add all of them:
 
    - Personal CFO Setup
    - Personal CFO Data Layer
@@ -66,7 +74,7 @@ Plugin availability depends on your plan, workspace settings, and which features
 
    - **Create a Personal CFO Data folder for me**, or
    - **Use an existing Google Drive folder**.
-5. Setup runs the initial financial-data sync and creates a small Google Drive document called `Personal CFO Home` in that folder. This stores the folder location only—no account information—and lets every other Personal CFO plugin find the same record in future chats.
+5. Setup runs the initial financial-data sync and creates a small Google Drive document called `Personal CFO Home` in that top-level folder. This stores the folder location only—no account information—and lets every other Personal CFO plugin use that folder as the shared home for transactional data, uploaded files, and supporting documents in future chats.
 6. Review the summary. It will tell you what accounts and history it found, what needs reconnecting, and whether the shared Personal CFO location is ready for the other plugins.
 
 That is it. Your private financial record is stored in your Google Drive, and you can return later for a fuller review, report, plan, portfolio review, or tax-preparation worksheet.

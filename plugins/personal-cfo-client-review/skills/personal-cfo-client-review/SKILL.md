@@ -8,8 +8,8 @@ Compare the selected period with the prior period and prior year when possible. 
 
 ## Data-source bridge
 
-Resolve the Personal CFO folder from an ID or Drive link the user gave in this chat. If none was provided, search connected Google Drive for the exact native Google Doc named `Personal CFO Home`, read its active folder ID, and verify the document belongs to that folder. If no valid locator exists, or more than one valid locator exists, ask the user to identify the intended folder. Do not guess.
+Resolve the household's top-level budget-and-financial-information folder from an ID or Drive link the user gave in this chat. If none was provided, search connected Google Drive for the exact native Google Doc named `Personal CFO Home`, read its active folder ID, and verify the document belongs to that folder. Treat the resolved folder as the complete working scope for the warehouse, uploaded files, and supporting documents. If no valid locator exists, or more than one valid locator exists, ask the user to identify the intended folder. Do not guess.
 
-Start with the user's identified Google Drive transactional-data folder. Use the newest dated `Financial Warehouse Sync - YYYY-MM-DD` for the current period and `Financial Data Warehouse` for prior-period comparisons. Validate `Sources`, `Sync_State`, transaction-date coverage, and account `connection_status` before calling a change material. Treat login-required or other stale snapshots as data limitations, not zero balances or missing accounts.
+Start with the resolved top-level folder. Use the newest dated `Financial Warehouse Sync - YYYY-MM-DD` for the current period and `Financial Data Warehouse` for prior-period comparisons. Validate `Sources`, `Sync_State`, transaction-date coverage, and account `connection_status` before calling a change material. Treat login-required or other stale snapshots as data limitations, not zero balances or missing accounts.
 
 Before comparing household periods, summarize warehouse provenance and ask the user to confirm its origin. If already confirmed in the current thread, reuse that confirmation; otherwise do not present account-specific conclusions yet.

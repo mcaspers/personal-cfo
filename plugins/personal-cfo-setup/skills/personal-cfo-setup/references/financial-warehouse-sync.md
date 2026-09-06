@@ -19,10 +19,9 @@ Never bootstrap a replacement while a same-named warehouse in the target context
 
 This skill must not depend on any individual's spreadsheet IDs, folder IDs, institution names, account IDs, or manual-memory identifiers.
 
-Optional runtime configuration:
+Runtime configuration:
 - `warehouse_spreadsheet_id`: strongest identity when a canonical warehouse is already known;
-- `target_folder_id` or `target_folder_url`: preferred destination folder when explicitly configured;
-- `target_folder_name`: defaults to `Transactional Data`;
+- `target_folder_id` or `target_folder_url`: required top-level household budget-and-financial-information folder selected during Setup;
 - `warehouse_name`: defaults to `Financial Data Warehouse`.
 
 If no spreadsheet ID is configured, use bootstrap discovery.
@@ -42,32 +41,27 @@ Before any sync, resolve the target folder **first**, then resolve the canonical
 Target warehouse name:
 `Financial Data Warehouse`
 
-Default destination folder name:
-`Transactional Data`
-
-The folder name is a default convention. A caller may configure a different destination by folder ID, folder URL, or name.
-
 Discovery rules:
 
 1. Resolve exactly one active target folder.
-   - Prefer an explicitly configured `target_folder_id` or `target_folder_url`.
-   - Otherwise search for an exact active folder named `Transactional Data`.
+   - Use the `target_folder_id` or `target_folder_url` supplied by Setup.
    - Exclude trashed folders.
-   - If multiple active folders match, **fail closed**.
-2. Search only inside the resolved target folder for a native Google Sheet named exactly `Financial Data Warehouse`.
+   - If it is absent, inaccessible, or ambiguous, **fail closed** and ask Setup to identify the household's top-level folder.
+2. If Setup supplies `warehouse_spreadsheet_id` or a Google Sheet URL, fetch that exact Sheet and verify that it is native Google Sheets, not trashed, and inside the resolved target folder. If valid, use it as the canonical warehouse and skip name-based discovery. If it fails any check, stop and explain the mismatch; do not silently choose or create another workbook.
+3. If Setup did not supply a Sheet, search only inside the resolved target folder for a native Google Sheet named exactly `Financial Data Warehouse`.
    - Restrict by parent folder ID.
    - Restrict to native Google Sheets.
    - Require `trashed = false`.
    - Do **not** accept a global Drive search result that merely has the right title.
-3. If exactly one active matching warehouse exists inside the target folder, use it.
-4. If multiple active matching warehouses exist inside the target folder, **fail closed** and report an ambiguity.
-5. Separately check for same-named trashed warehouse candidates associated with the target folder.
+4. If exactly one active matching warehouse exists inside the target folder, use it.
+5. If multiple active matching warehouses exist inside the target folder, **fail closed** and report an ambiguity.
+6. Separately check for same-named trashed warehouse candidates associated with the target folder.
    - If an otherwise matching warehouse exists in Trash, **fail closed**.
    - Report that the existing warehouse must be restored or explicitly replaced.
    - Do not treat a trashed file as canonical.
    - Do not silently create a replacement while a same-named trashed warehouse exists.
-6. If warehouse lookup fails because of permissions, connector errors, unavailable Drive access, or an unresolved folder, **do not create a replacement**.
-7. Create a new warehouse only when:
+7. If warehouse lookup fails because of permissions, connector errors, unavailable Drive access, or an unresolved folder, **do not create a replacement**.
+8. Create a new warehouse only when:
    - the target folder is positively accessible;
    - there are zero active matching warehouses inside it;
    - there are zero matching trashed candidates requiring recovery;
@@ -77,15 +71,7 @@ Never create a second warehouse merely because a lookup timed out, returned an a
 
 ### Folder handling
 
-If a configured target folder exists, use it.
-
-If no target folder is configured:
-- search for an accessible folder named exactly the default `Transactional Data`;
-- if exactly one exists, use it;
-- if multiple exist, fail closed and require a disambiguated destination;
-- if none exists and folder creation is permitted, create `Transactional Data`.
-
-Do not create duplicate target folders when discovery is ambiguous or inaccessible.
+Use the target folder selected during Setup. Do not search for or create another folder by name. If that folder is inaccessible or ambiguous, stop before creating a workbook.
 
 ### Creating a new warehouse
 
@@ -944,8 +930,8 @@ This portable skill is intended to work without source-code edits.
 
 A new user should:
 1. connect/authorize Google Drive and Finances;
-2. optionally choose a destination folder;
-3. run the skill;
+2. choose the top-level folder that holds the household's budget and financial information;
+3. pass that folder to the sync as `target_folder_id` or `target_folder_url`;
 4. allow bootstrap discovery to find or create exactly one canonical `Financial Data Warehouse`;
 5. let the first run perform a full reconciliation;
 6. use delta reconciliation for normal follow-up runs.
