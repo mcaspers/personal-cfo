@@ -1,6 +1,6 @@
 ---
 name: financial-warehouse-sync
-description: Synchronize connected Finances data into the selected household Financial Data Warehouse in Google Drive. Use after Personal CFO Setup has created or identified the household folder.
+description: Synchronize connected Finances data into the Financial Data Warehouse created or identified by Personal CFO Setup. Use only after setup has established the household's Drive location.
 ---
 
 # Financial Warehouse Sync — Hardened v2
@@ -8,6 +8,12 @@ description: Synchronize connected Finances data into the selected household Fin
 ## Web app scope
 
 This is an upload-ready ChatGPT web skill for the first and later live imports of a household's connected Finances data. Use it only in ChatGPT on the web, where both Finances and Google Drive are connected and usable. Do not run it in the desktop app.
+
+## Setup prerequisite
+
+Run **Personal CFO Setup** before using this skill. This skill expects one existing household foundation: an active top-level Personal CFO folder, a `Personal CFO Home` locator (or a folder link supplied in the current chat), and one native Google Sheet named `Financial Data Warehouse` in that folder. Setup may also have created document folders for transactional records, benefits and insurance, debt, legal records, investments, property, and vehicles.
+
+This skill is a live-data importer, not a folder or workbook setup tool. Preserve the existing household structure. If the required location, locator, or worksheet cannot be resolved, stop and direct the user back to Personal CFO Setup; do not create a new folder, locator, or replacement workbook.
 
 ## Required readiness check and confirmation gate
 
@@ -35,7 +41,7 @@ Current sync skill version: `v2.4-portable`.
 
 Never create a replacement workbook during a normal sync.
 Never accept a trashed warehouse as canonical.
-Never bootstrap a replacement while a same-named warehouse in the target context is in Trash unless the user explicitly authorizes replacement. Once a canonical warehouse is resolved, update that warehouse in place.
+Never initialize a replacement while a same-named warehouse in the target context is in Trash unless the user explicitly authorizes replacement. Once a canonical warehouse is resolved, update that warehouse in place.
 
 
 ## Portable configuration
@@ -47,17 +53,17 @@ Runtime configuration:
 - `target_folder_id` or `target_folder_url`: required top-level household budget-and-financial-information folder selected during Setup;
 - `warehouse_name`: defaults to `Financial Data Warehouse`.
 
-If no spreadsheet ID is configured, use bootstrap discovery.
+If no spreadsheet ID is configured, use setup-location discovery.
 
 Do not require the user to edit this skill merely to supply their own Drive IDs when the host environment supports runtime or persisted configuration.
 
 Institution names may appear in source data, but no institution may be embedded here as a required verification sentinel.
 
-## Bootstrap mode
+## Setup-created workbook mode
 
-The skill supports **bootstrap mode** for a fresh environment where the canonical warehouse does not yet exist.
+The skill supports first-run schema initialization for the empty canonical worksheet created by Personal CFO Setup. It does not create a new worksheet.
 
-### Discovery before creation
+### Discovery after setup
 
 Before any sync, resolve the target folder **first**, then resolve the canonical warehouse **only within that folder**.
 
@@ -70,7 +76,7 @@ Discovery rules:
    - Use the `target_folder_id` or `target_folder_url` supplied by Setup.
    - Exclude trashed folders.
    - If it is absent, inaccessible, or ambiguous, **fail closed** and ask Setup to identify the household's top-level folder.
-2. If Setup supplies `warehouse_spreadsheet_id` or a Google Sheet URL, fetch that exact Sheet and verify that it is native Google Sheets, not trashed, and inside the resolved target folder. If valid, use it as the canonical warehouse and skip name-based discovery. If it is a new, uninitialized sheet created by Personal CFO Setup, initialize that exact sheet in place using the bootstrap schema contract before importing facts. If it fails any check, stop and explain the mismatch; do not silently choose or create another workbook.
+2. If Setup supplies `warehouse_spreadsheet_id` or a Google Sheet URL, fetch that exact Sheet and verify that it is native Google Sheets, not trashed, and inside the resolved target folder. If valid, use it as the canonical warehouse and skip name-based discovery. If it is a new, uninitialized sheet created by Personal CFO Setup, initialize that exact sheet in place using the setup-created workbook schema contract before importing facts. If it fails any check, stop and explain the mismatch; do not silently choose or create another workbook.
 3. If Setup did not supply a Sheet, search only inside the resolved target folder for a native Google Sheet named exactly `Financial Data Warehouse`.
    - Restrict by parent folder ID.
    - Restrict to native Google Sheets.
@@ -83,30 +89,25 @@ Discovery rules:
    - Report that the existing warehouse must be restored or explicitly replaced.
    - Do not treat a trashed file as canonical.
    - Do not silently create a replacement while a same-named trashed warehouse exists.
-7. If warehouse lookup fails because of permissions, connector errors, unavailable Drive access, or an unresolved folder, **do not create a replacement**.
-8. Create a new warehouse only when:
-   - the target folder is positively accessible;
-   - there are zero active matching warehouses inside it;
-   - there are zero matching trashed candidates requiring recovery;
-   - discovery completed without access or connector errors.
+7. If warehouse lookup fails because of permissions, connector errors, unavailable Drive access, an unresolved folder, or no matching worksheet, stop and direct the user back to Personal CFO Setup. **Do not create a replacement.**
 
 Never create a second warehouse merely because a lookup timed out, returned an access error, or found a matching file outside the resolved target folder.
 
 ### Folder handling
 
-Use the target folder selected during Setup. Do not search for or create another folder by name. If that folder is inaccessible or ambiguous, stop before creating a workbook.
+Use the target folder selected during Setup. Do not search for or create another folder by name. If that folder is inaccessible or ambiguous, stop before initializing or syncing the workbook.
 
-### Creating a new warehouse
+### Initializing the setup-created warehouse
 
-When bootstrap is required, either use the valid empty Sheet supplied by Personal CFO Setup or create one native Google Sheet named `Financial Data Warehouse`.
+When first-run initialization is required, use the valid empty Sheet supplied or resolved from Personal CFO Setup. Never create a native Google Sheet from this skill.
 
-For a supplied empty Sheet, preserve its identity and parent folder. For a newly created Sheet, immediately place it in the resolved target folder. In either case:
+For the setup-created empty Sheet, preserve its identity and parent folder:
 
 1. Re-read its Drive metadata and verify:
    - its parent folder is the resolved target folder;
    - it is not trashed;
    - its MIME type is native Google Sheets.
-2. If placement verification fails, **stop bootstrap**. Do not initialize financial tables in a file whose destination is unresolved.
+2. If placement verification fails, stop. Do not initialize financial tables in a file whose destination is unresolved.
 3. Record its spreadsheet ID and URL as the canonical warehouse for the run.
 4. Create the complete v2 schema before writing financial facts.
 
@@ -128,7 +129,7 @@ Required tabs:
 
 Do not create a simplified seven-tab demonstration workbook.
 
-### Bootstrap schema contract
+### Setup-created workbook schema contract
 
 Create the physical stable-key columns required by the current skill contract.
 
@@ -171,7 +172,7 @@ Must include:
 
 Stable key: `stream_id`.
 
-A freshly bootstrapped warehouse has no legacy recurring migration state.
+A freshly initialized setup-created warehouse has no legacy recurring migration state.
 
 #
 #### Normalized recurring cash-flow semantics
@@ -281,8 +282,8 @@ Set at minimum:
 
 - `Dataset` = `Financial data warehouse`
 - `Warehouse schema version` = `v2`
-- `Bootstrap status` = `initialized`
-- `Bootstrap created_at` = current ISO 8601 timestamp
+- `Setup initialization status` = `initialized`
+- `Setup initialization created_at` = current ISO 8601 timestamp
 - `Purpose` = portable structured financial warehouse for Google Drive / GPT workflows
 
 ### Initialize Sync_State
@@ -331,7 +332,7 @@ Create the full v2 audit schema including:
 
 ### First-run behavior
 
-A newly bootstrapped warehouse must perform a **full reconciliation**, never a delta reconciliation.
+A newly initialized setup-created warehouse must perform a **full reconciliation**, never a delta reconciliation.
 
 Reason:
 - there is no trusted checkpoint;
@@ -347,12 +348,12 @@ The first full reconciliation uses the normal safety contract:
 - verify all stable keys;
 - only then advance checkpoints.
 
-### Bootstrap rollback behavior
+### First-run initialization rollback behavior
 
 If warehouse creation succeeds but schema initialization fails:
 
 - do not treat the file as a valid canonical warehouse;
-- mark `Metadata` bootstrap status as `failed` if possible;
+- mark `Metadata` setup initialization status as `failed` if possible;
 - report the partially initialized spreadsheet;
 - do not write financial facts into an incomplete schema.
 
@@ -362,7 +363,7 @@ If financial-data synchronization fails after schema initialization:
 - record failures in `Sync_Runs`;
 - do not create another warehouse on retry.
 
-### Post-bootstrap idempotency
+### Post-initialization idempotency
 
 After the initial full reconciliation succeeds:
 
@@ -381,7 +382,7 @@ Every successful run must be able to report:
 
 If these conditions cannot be verified, the run must not report successful warehouse resolution.
 
-### Canonical identity after bootstrap
+### Canonical identity after initialization
 
 Once a warehouse is created successfully, its spreadsheet ID is the strongest canonical identity.
 
@@ -886,7 +887,7 @@ For every run:
 - identify all pre-existing manual asset/debt snapshots and verify they remain unless superseded by a newer explicit manual snapshot;
 - never require a particular bank, broker, insurer, mortgage company, employer, or account name to exist.
 
-A newly bootstrapped warehouse may legitimately contain none of these categories.
+A newly initialized setup-created warehouse may legitimately contain none of these categories.
 
 ## Verification
 
