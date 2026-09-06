@@ -18,20 +18,17 @@ You should not need to use a terminal, GitHub, or code to use Personal CFO.
 
 ### What you need
 
-1. A **ChatGPT subscription or workspace plan** that gives your account access to **ChatGPT Work**, **Plugins**, and **Finances**.
+1. A **ChatGPT Plus or Pro subscription** with access to **Plugins**, **Google Drive**, and **Finances**. Finances is currently available to eligible U.S. Plus and Pro users on the web.
 2. The ChatGPT desktop app. You will use it to add Personal CFO and install the setup plugin.
 3. A Google account with Google Drive.
-4. A computer with a web browser. You start Finances from the desktop app, but connect financial accounts in ChatGPT Work on the web.
+4. A computer with a web browser. The first live financial-data sync happens in ChatGPT on the web.
 
-Plugin availability depends on your plan, workspace settings, and which features are available to your account. If you do not see **Work**, **Plugins**, or **Finances** in ChatGPT, stop there—this setup will not work on that account yet. See [OpenAI’s plugin availability guidance](https://learn.chatgpt.com/docs/use-chatgpt?translationFallback=fr-FR) and [Finances setup guidance](https://learn.chatgpt.com/fr-FR/use-cases/track-bills-subscriptions-and-spending).
+Plugin availability depends on your plan, workspace settings, and which features are available to your account. If you do not see **Plugins**, **Google Drive**, or **Finances** in ChatGPT, stop there—this setup will not work on that account yet.
 
 ### First, connect your apps
 
 1. In the **ChatGPT desktop app**, open the main **Plugins** tab and add **Google Drive**. Follow the normal Google sign-in steps to connect it.
-2. Add **Finances** from the same main Plugins tab. The desktop app opens **ChatGPT Work on the web** at the Finances page.
-3. On the page headed **“Connect your financial accounts,”** click **Connect Accounts**. Follow the secure connection screens for each bank, card, loan, investment, or other account you want to include. Never enter a bank password into a ChatGPT conversation.
-4. When the connections are complete, return to the ChatGPT desktop app.
-5. Both Google Drive and Finances must be available on your plan before Personal CFO can use them.
+2. You will connect **Finances** later in ChatGPT on the web, immediately before the first live sync. Never enter a bank password into a ChatGPT conversation.
 
 ### Add the Personal CFO marketplace
 
@@ -69,19 +66,22 @@ Plugin availability depends on your plan, workspace settings, and which features
 2. Paste this message:
 
    ```text
-   Set up my Personal CFO and create my first financial check-in.
+   Set up my Personal CFO financial home.
    ```
 
 3. The first question asks whether you are starting a new household record or joining one that your spouse, partner, or another household member already set up.
 
    - **Starting a new record:** continue to the next step.
    - **Joining an existing record:** ask the person who manages the household's budget and financial information to share that Google Drive folder with your Google account. Then paste its Google Drive link or folder ID when Personal CFO asks. That is all this setup path needs: it uses the established record rather than connecting your accounts or creating a duplicate.
-4. For a new household record, Setup moves directly into the data connection: connect Finances and Google Drive, then choose where to store the record:
+4. For a new household record, Setup connects Google Drive and asks where to store the record:
 
    - **Create a Personal CFO Data folder for me**, or
    - **Use an existing Google Drive folder**.
-5. Setup runs the initial financial-data sync and creates a small Google Drive document called `Personal CFO Home` in that top-level folder. This stores the folder location only—no account information—and lets every other Personal CFO plugin use that folder as the shared home for transactional data, uploaded files, and supporting documents in future chats.
-6. Review the summary. It will tell you what accounts and history it found, what needs reconnecting, and whether the shared Personal CFO location is ready for the other plugins.
+5. Setup reuses an existing `Personal CFO Data` folder if it finds one, so it does not create a second household record. It creates the spreadsheet, simple document folders, and a small Google Drive document called `Personal CFO Home` in the one active top-level folder. The folders are for transactional data, benefits and insurance, debt and credit, estate and legal records, investments and retirement, and property and vehicles. Upload copies of any documents you want available there now or later; they are not required for the first live-data sync.
+6. To import your live data, open [ChatGPT Finances on the web](https://chatgpt.com/finances), click **Connect Accounts**, and complete the secure connection screens for the accounts you want to include. Wait until Finances shows that account data has synced.
+7. In ChatGPT on the web, open **Skills** → **Create** → **Upload from your computer**. Download and upload [Financial Warehouse Sync](web-skills/financial-warehouse-sync.zip).
+8. Start a new web chat, run **Financial Warehouse Sync**, and say: `Sync my connected financial data into the Financial Data Warehouse in my Personal CFO folder.` Provide the folder or spreadsheet link if asked. The web skill first checks whether Finances is ready, then asks for your final confirmation before it writes anything.
+9. The web skill's completion summary tells you what data it found and whether the shared Personal CFO location is ready for the other plugins.
 
 That is it. Your private financial record is stored in your Google Drive, and you can return later for a fuller review, report, plan, portfolio review, or tax-preparation worksheet.
 
@@ -111,7 +111,7 @@ codex plugin marketplace add "$(pwd)"
 codex plugin add personal-cfo-setup@personal-cfo
 ```
 
-Start a new Codex task after installation, then ask: `Set up my Personal CFO and create my first financial check-in.`
+Start a new Codex task after installation, then ask: `Set up my Personal CFO financial home.`
 
 The marketplace catalog is [`.agents/plugins/marketplace.json`](.agents/plugins/marketplace.json). The `plugins/` directory contains Personal CFO Setup plus the optional advanced workflows.
 

@@ -1,6 +1,6 @@
 ---
 name: personal-cfo-setup
-description: Create or join a household's Personal CFO data foundation in Google Drive and connect its financial-data sources.
+description: Create or join a household's Personal CFO data foundation in Google Drive, then hand off first-time financial syncing to ChatGPT on the web.
 ---
 # Personal CFO Setup
 
@@ -8,7 +8,7 @@ This is the beginner-friendly data-foundation entry point to Personal CFO. Help 
 
 ## The promise
 
-Start with: "I’ll connect or create your private financial home base. Once it is ready, the other Personal CFO tools can use it for reports, reviews, and planning."
+Start with: "I’ll create or connect your private financial home base. Once it is ready, the other Personal CFO tools can use it for reports, reviews, and planning."
 
 Call the underlying record a **private financial record**, never a warehouse unless the user asks for technical detail. Explain that their data stays in their connected accounts and Google Drive, subject to the permissions they approve.
 
@@ -28,14 +28,13 @@ Create or update one native Google Doc in that top-level folder named `Personal 
 
 Once the folder ID and locator are confirmed, integration is complete. Do not ask the joining user to connect Finances, run the first-time sync, create a folder, or complete the first-time setup questions. Explain any limitation if their Google Drive account cannot access the shared folder.
 
-### 2. Connect only what is needed
+### 2. Connect Google Drive
 
 This step is for a new household setup only.
 
-Ask the user to connect Finances and Google Drive when they are not already connected. In plain language, explain why each is needed:
+Ask the user to connect Google Drive when it is not already connected. Explain that it stores the user's private financial record, supporting documents, and history.
 
-- Finances provides connected-account activity and balances.
-- Google Drive stores the user's private financial record, supporting documents, and history.
+Do not ask the user to connect Finances in the desktop app. The first live import happens in ChatGPT on the web, where the user connects Finances later.
 
 Never ask the user to paste account numbers, passwords, or sensitive credentials into the chat. If a connector is unavailable, explain the limitation and offer a document or CSV-based starting point only if supported by the current surface.
 
@@ -45,48 +44,69 @@ This step is for a new household setup only.
 
 Ask one simple question: "Would you like me to create a `Personal CFO Data` folder in Google Drive, or use an existing folder?"
 
+Before creating a folder, look in the selected Drive location for an active folder named exactly `Personal CFO Data`.
+
+- If exactly one exists, offer to use it. Do not create another folder with that name.
+- If none exists, create one only after the user confirms the location.
+- If more than one exists, stop and ask which one is the household's active record. Prefer the folder that already contains `Personal CFO Home` or `Financial Data Warehouse`, but do not choose or delete a folder silently.
+- If Setup created an empty duplicate during the current chat, identify the chosen authoritative folder, then ask for explicit permission before moving that empty duplicate to Trash. Never delete a folder that contains files, a worksheet, or a `Personal CFO Home` locator.
+
 If the user chooses an existing folder, ask them to select or link it. If they choose a new folder, confirm that it will contain a spreadsheet named `Financial Data Warehouse` plus their supporting records. Do not expose IDs or require the user to edit configuration.
 
 Then ask: "Do you already have a Google Sheet you want to use as your financial record?" If yes, ask them to share or paste its Google Sheet link and confirm it belongs in the selected folder. If no, explain that Setup will create `Financial Data Warehouse` in that folder.
 
-### 4. Confirm before account-specific analysis
+### 4. Confirm the private location
 
 This step is for a new household setup only.
 
-Before reading account-specific facts, summarize the intended handoff: the selected Drive location, connected source names, and whether this is a first-time or refresh setup. Ask for confirmation that this is the user's own financial data. Reuse confirmation already given in the same thread.
+Before creating files, summarize the selected Drive location and whether the user chose a new or existing Google Sheet. Ask for confirmation that it is their intended household location. Reuse confirmation already given in the same thread.
 
-### 5. Build the private financial record
+### 5. Create the private financial home
 
-This step is for a new household setup only, after the user has connected their accounts and chosen the Drive folder.
+This step is for a new household setup only, after the user has connected Google Drive and chosen the Drive folder.
 
-Pass the selected top-level folder as `target_folder_id` or `target_folder_url`. When the user provided a Google Sheet, also pass it as `warehouse_spreadsheet_id` or its Google Sheet URL. Then read and follow [financial-warehouse-sync.md](references/financial-warehouse-sync.md). It uses the provided Sheet when it is a live Google Sheet inside the selected folder; otherwise, when no Sheet was provided, it safely creates `Financial Data Warehouse` there. It then imports the available history, preserves manual values and stale-but-known facts, and verifies the result.
+Use the selected top-level folder as the household's private location. When the user supplied a Google Sheet, verify that it is a live Google Sheet inside that folder and preserve it. When no Sheet was supplied, create one native Google Sheet named `Financial Data Warehouse` in that folder. Verify the sheet's parent folder and active status.
 
-Do not turn its technical checkpoints into user tasks. If it reports a blocking ambiguity, translate it clearly. Example: "I found two possible Personal CFO folders. To avoid putting information in the wrong place, please choose the one you want to use."
+Do not retrieve, analyze, or import financial-account data in this desktop setup. Leave a newly created sheet ready for the separate web sync skill to initialize and populate.
 
-### 6. Create the Personal CFO Home locator
+### 6. Create a simple document home
 
-After the sync has successfully resolved the canonical record, create or update one native Google Doc inside the selected top-level budget-and-financial-information folder named `Personal CFO Home`. It contains only:
+Inside the selected top-level folder, create these folders only when they do not already exist. Preserve any existing folders and organization.
+
+- `Transactional Data` — exported statements, transaction files, and other day-to-day financial records.
+- `Benefits & Insurance` — employer benefits, health coverage, life insurance, home, auto, and umbrella policies.
+- `Debt & Credit` — loan, mortgage, credit-card, refinancing, and payoff records.
+- `Estate & Legal` — trusts, wills, healthcare proxies, powers of attorney, and other legal documents.
+- `Investments & Retirement` — IRA, 401(k), brokerage, pension, and investment-account documents.
+- `Property & Vehicles` — home-value records, mortgage-related property documents, and vehicle-value records.
+
+Explain in plain language: "You can upload copies of the financial documents you already have to the matching folders now or later. They are for your own record and for future Personal CFO work; they are not required before your first account-data sync."
+
+Do not ask the user to upload passwords, account credentials, or documents they do not want stored in Drive. Do not move or rename existing user files without permission.
+
+### 7. Create the Personal CFO Home locator
+
+After the Drive location and spreadsheet are resolved, create or update one native Google Doc inside the selected top-level budget-and-financial-information folder named `Personal CFO Home`. It contains only:
 
 - `Active Personal CFO folder ID: <folder ID>`
 - `Active Personal CFO folder URL: <folder URL>`
 
 Verify the document is in the selected top-level folder. This locator is not a financial report and must not contain balances, transactions, account numbers, or credentials. Future Personal CFO plugins resolve this exact document when the folder is not already identified in the current chat. That resolved folder is their working scope for the household's warehouse, uploaded files, and supporting documents.
 
-### 7. Give a human completion summary
+### 8. Hand off the first live sync to ChatGPT on the web
 
-For a new household setup, report only what a household needs to know:
+For a new household setup, explain plainly that the private financial home is created but it does not contain live financial-account data yet. Then direct the user, one action at a time:
 
-- whether the private financial record is ready;
-- the number of accounts and the available transaction period, when known;
-- any accounts that need reconnecting;
-- any important data gaps; and
-- that `Personal CFO Home` is ready for the other Personal CFO plugins.
+1. Open [ChatGPT on the web](https://chatgpt.com/finances) and connect Finances. Wait until the Finances page shows that account data has synced.
+2. Open **Skills**, select **Create**, then **Upload from your computer**, and upload the separately supplied `financial-warehouse-sync.zip` package.
+3. Start a new web chat, run **Financial Warehouse Sync**, and tell it: "Sync my connected financial data into the Financial Data Warehouse in my Personal CFO folder."
+4. Give the web skill the selected Personal CFO folder or spreadsheet link if it asks. It automatically performs a read-only Finances readiness check, tells the user whether the connection is usable, and asks for a final confirmation before it writes live data into the spreadsheet.
 
-Never imply that absent, stale, or login-required data is zero or closed. Do not expose unnecessary account numbers, spreadsheet IDs, audit hashes, raw provider IDs, or internal tab names.
+Do not describe the household as fully set up until the web skill confirms a successful sync. Do not expose unnecessary folder IDs, spreadsheet IDs, account numbers, audit hashes, raw provider IDs, or internal tab names.
 
 ## Ongoing use
 
-Explain the system in one short paragraph: account data can be refreshed through connected Finances, the private record lives in the user's Drive, and the other Personal CFO tools automatically look for `Personal CFO Home` when a new chat does not already identify the folder. Ask before creating a recurring refresh schedule.
+Explain the system in one short paragraph: the private record lives in the user's Drive; connected Finances data is synced into it from ChatGPT on the web; and the other Personal CFO tools automatically look for `Personal CFO Home` when a new chat does not already identify the folder. Ask before creating a recurring refresh schedule.
 
 ## Safety boundaries
 

@@ -1,4 +1,27 @@
+---
+name: financial-warehouse-sync
+description: Synchronize connected Finances data into the selected household Financial Data Warehouse in Google Drive. Use after Personal CFO Setup has created or identified the household folder.
+---
+
 # Financial Warehouse Sync — Hardened v2
+
+## Web app scope
+
+This is an upload-ready ChatGPT web skill for the first and later live imports of a household's connected Finances data. Use it only in ChatGPT on the web, where both Finances and Google Drive are connected and usable. Do not run it in the desktop app.
+
+## Required readiness check and confirmation gate
+
+At the beginning of every run, automatically perform a **read-only** Finances readiness check. Confirm that Finances has completed an account sync and can return at least a connection status, account count, or available-data period. Also verify that Google Drive can access the intended top-level folder and its selected spreadsheet.
+
+Report the result in plain language without displaying account numbers, balances, or transactions. For example: "Finances is connected and data is available. I found your Financial Data Warehouse in your Personal CFO folder. Would you like me to sync it now?"
+
+Do not create, initialize, modify, or populate the workbook until the user gives an explicit affirmative answer in this web chat. A confirmation given earlier to the desktop setup plugin does not satisfy this gate.
+
+If Finances is not connected, has not finished syncing, or cannot return a read-only availability check, stop and tell the user to finish or wait for the Finances sync. Do not write an empty financial import and do not describe the record as ready. If Drive cannot resolve exactly one intended folder and workbook, stop and ask the user for its link.
+
+## Resolve the setup-created location
+
+Prefer a folder or spreadsheet link supplied in the current chat. Otherwise, look for the exact native Google Doc `Personal CFO Home` in the selected household folder and read its active-folder location. Treat that top-level folder as the only scope for the warehouse, uploaded files, and supporting documents. Do not search globally for similarly named folders.
 
 ## Canonical destination
 
@@ -47,7 +70,7 @@ Discovery rules:
    - Use the `target_folder_id` or `target_folder_url` supplied by Setup.
    - Exclude trashed folders.
    - If it is absent, inaccessible, or ambiguous, **fail closed** and ask Setup to identify the household's top-level folder.
-2. If Setup supplies `warehouse_spreadsheet_id` or a Google Sheet URL, fetch that exact Sheet and verify that it is native Google Sheets, not trashed, and inside the resolved target folder. If valid, use it as the canonical warehouse and skip name-based discovery. If it fails any check, stop and explain the mismatch; do not silently choose or create another workbook.
+2. If Setup supplies `warehouse_spreadsheet_id` or a Google Sheet URL, fetch that exact Sheet and verify that it is native Google Sheets, not trashed, and inside the resolved target folder. If valid, use it as the canonical warehouse and skip name-based discovery. If it is a new, uninitialized sheet created by Personal CFO Setup, initialize that exact sheet in place using the bootstrap schema contract before importing facts. If it fails any check, stop and explain the mismatch; do not silently choose or create another workbook.
 3. If Setup did not supply a Sheet, search only inside the resolved target folder for a native Google Sheet named exactly `Financial Data Warehouse`.
    - Restrict by parent folder ID.
    - Restrict to native Google Sheets.
@@ -75,17 +98,17 @@ Use the target folder selected during Setup. Do not search for or create another
 
 ### Creating a new warehouse
 
-When bootstrap is required:
+When bootstrap is required, either use the valid empty Sheet supplied by Personal CFO Setup or create one native Google Sheet named `Financial Data Warehouse`.
 
-1. Create one native Google Sheet named `Financial Data Warehouse`.
-2. Immediately place/move that new sheet into the resolved target folder before schema initialization.
-3. Re-read its Drive metadata and verify:
+For a supplied empty Sheet, preserve its identity and parent folder. For a newly created Sheet, immediately place it in the resolved target folder. In either case:
+
+1. Re-read its Drive metadata and verify:
    - its parent folder is the resolved target folder;
    - it is not trashed;
    - its MIME type is native Google Sheets.
-4. If placement verification fails, **stop bootstrap**. Do not initialize financial tables in a file whose destination is unresolved.
-5. Record its spreadsheet ID and URL as the canonical warehouse for the run.
-6. Create the complete v2 schema before writing financial facts.
+2. If placement verification fails, **stop bootstrap**. Do not initialize financial tables in a file whose destination is unresolved.
+3. Record its spreadsheet ID and URL as the canonical warehouse for the run.
+4. Create the complete v2 schema before writing financial facts.
 
 Required tabs:
 
@@ -929,11 +952,11 @@ A full reconcile followed by an immediate near-no-op delta is the production-rea
 This portable skill is intended to work without source-code edits.
 
 A new user should:
-1. connect/authorize Google Drive and Finances;
-2. choose the top-level folder that holds the household's budget and financial information;
-3. pass that folder to the sync as `target_folder_id` or `target_folder_url`;
-4. allow bootstrap discovery to find or create exactly one canonical `Financial Data Warehouse`;
-5. let the first run perform a full reconciliation;
+1. run Personal CFO Setup in the desktop app to create or identify the top-level household folder and spreadsheet;
+2. open ChatGPT on the web, connect/authorize Finances and Google Drive, and wait for Finances to finish syncing;
+3. upload and run this skill in the web app;
+4. provide the Personal CFO folder or spreadsheet link when asked;
+5. let the first run initialize the selected sheet and perform a full reconciliation;
 6. use delta reconciliation for normal follow-up runs.
 
 If the user already has a canonical warehouse, provide or persist its spreadsheet ID as runtime configuration when possible.

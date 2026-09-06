@@ -1,7 +1,7 @@
 {
   "name": "personal-cfo-setup",
   "version": "0.1.0",
-  "description": "Guides a household through creating a private, source-aware financial record and first financial check-in.",
+  "description": "Guides a household through creating a private Google Drive home for its financial information.",
   "author": {
     "name": "mcaspers"
   },
@@ -11,11 +11,11 @@
   "interface": {
     "displayName": "Personal CFO Setup",
     "shortDescription": "Set up your private financial home base.",
-    "longDescription": "Connect your accounts and Drive, create a private financial record you control, and receive your first financial check-in.",
+    "longDescription": "Create a private Google Drive home for your household's financial information, ready for its first web-based sync.",
     "developerName": "mcaspers",
     "category": "Productivity",
     "capabilities": [],
-    "defaultPrompt": ["Set up my Personal CFO and create my first financial check-in."]
+    "defaultPrompt": ["Set up my Personal CFO financial home."]
   },
   "apps": "./.app.json"
 }
