@@ -13,6 +13,12 @@ Resolve the household's top-level budget-and-financial-information folder from a
 
 Use the one active native Google Sheet named `Financial Data Warehouse` inside `Transactional Data`. If the locator, subfolder, or warehouse is missing, inaccessible, or ambiguous, ask the user for the intended link. Never create, move, replace, or infer a household record.
 
+## Choose the review window
+
+At the beginning of the conversation, after resolving the warehouse and before reading transaction history or beginning a category discussion, ask: “How far back would you like to review for this household context—three months, six months, a year, all available history, or another period?” Do not assume a default period. Let the user choose a rolling lookback or a specific start and end date.
+
+Read only the minimum metadata needed to state the available transaction-date range. If the chosen period is partly unavailable, explain the coverage gap and ask whether to use the available portion, select another period, or stop. Confirm the effective review window before analyzing transactions. Keep the transaction, category, ambiguity, and pattern review within that window; do not expand it for an automatic comparison. If a comparison would be useful, offer one only when it can be made within the chosen window or the user explicitly expands the scope.
+
 Before discussing account-specific details, look in the resolved top-level folder for the exact native Google Doc `Personal CFO Household Context`. If exactly one exists, read it before reviewing transactions and treat its confirmed rules and any user-added household-contact notes as user-provided context. If it is missing, continue without one. If more than one exists, ask the user which document is active. Never use a context rule to overwrite synced data, infer a missing value, or replace source documents.
 
 Treat Household Context as a living record. On a repeat Lifestyle Review, state that this review can refresh the existing context. Revisit relevant saved classification rules, category descriptions, cash treatment, and seasonal patterns; ask whether each is still current, should be changed, should be retired, or should be deferred. Do not remove a rule merely because it was not revisited, but retain its prior confirmation date so its age remains visible. Preserve user-added household-contact notes unless the user asks to change or remove them.
@@ -21,7 +27,7 @@ Before discussing account-specific details, inspect `Metadata`, `Sources`, `Sync
 
 ## Transaction and classification review
 
-Read the complete available `Transactions` history in bounded date or row slices. When the user has not selected a period, focus the conversation on the most recent complete 90 days and compare the preceding equivalent period when coverage supports it.
+Read the confirmed review window in bounded date or row slices. Do not substitute a most-recent 90-day default or read transactions outside the effective window.
 
 Use the live headers instead of assuming a column order. Keep transaction IDs as text. Read amounts as numbers; when a numeric field is stored as text, call out the data-quality limitation and leave the sheet unchanged. Separate spending observations from transfers, card payments, refunds, reimbursements, and pending items whenever source fields support that distinction. If direction is ambiguous, discuss frequency and absolute amounts without calling the movement spending or income.
 
@@ -33,7 +39,7 @@ Treat cash separately as **Cash & Manual Spending**. Identify ATM withdrawals, c
 
 ## Category-by-category lifestyle review
 
-Create a review list from every spending category with activity in the period, plus Cash & Manual Spending when cash-funding transactions appear. Work through the categories one at a time; the user may defer any category. For each category, show its date range, transaction count, total when reliable, comparable-period change, ambiguous items, and any applicable confirmed baseline rules. Ask the user for a short description of what the category represents in their household and whether its normal level, frequency, or drivers need context. Keep that commentary distinct from transaction facts.
+Create a review list from every spending category with activity in the confirmed window, plus Cash & Manual Spending when cash-funding transactions appear. Work through the categories one at a time; the user may defer any category. For each category, show its date range, transaction count, total when reliable, changes supported within the selected window, ambiguous items, and any applicable confirmed baseline rules. Ask the user for a short description of what the category represents in their household and whether its normal level, frequency, or drivers need context. Keep that commentary distinct from transaction facts.
 
 For categories with seasonal or recurring variation, ask whether the change is expected and what time period it applies to. Offer neutral examples only as prompts: spring or fall patterns, winter heating, holiday spending, summer travel or cooling costs, school or camp-related spending, and other household routines. Ask about children, camps, travel, household composition, home heating or cooling, and general climate or region only if the user wants to provide that context; never request an address, names, ages, diagnoses, or other private details. A seasonal pattern must name its affected category, period, expected direction or range when volunteered, and user-provided explanation before it is saved.
 
