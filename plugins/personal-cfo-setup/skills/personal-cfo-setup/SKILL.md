@@ -66,6 +66,7 @@ Before creating files, summarize the selected Drive location and whether the use
 Inside the selected top-level folder, create these folders only when they do not already exist. Preserve any existing folders and organization.
 
 - `Transactional Data` — exported statements, transaction files, and other day-to-day financial records.
+- `Cash & Manual Spending` — cash-withdrawal notes, cash budgets, receipts, and other spending that connected accounts cannot categorize.
 - `Benefits & Insurance` — employer benefits, health coverage, life insurance, home, auto, and umbrella policies.
 - `Debt & Credit` — loan, mortgage, credit-card, refinancing, and payoff records.
 - `Estate & Legal` — trusts, wills, healthcare proxies, powers of attorney, and other legal documents.
@@ -102,7 +103,29 @@ For a new household setup, explain plainly that the private financial home is cr
 3. Start a new web chat, run **Financial Warehouse Sync**, and tell it: "Sync my connected financial data into the Financial Data Warehouse in my Personal CFO folder."
 4. Give the web skill the selected Personal CFO folder or spreadsheet link if it asks. It automatically performs a read-only Finances readiness check, tells the user whether the connection is usable, and asks for a final confirmation before it writes live data into the spreadsheet.
 
-Do not describe the household as fully set up until the web skill confirms a successful sync. Do not expose unnecessary folder IDs, spreadsheet IDs, account numbers, audit hashes, raw provider IDs, or internal tab names.
+After giving this handoff, stop. Ask the user to return to this same Setup conversation after **Financial Warehouse Sync** reports that it has finished. Do not poll, create a recurring task, or begin the document-gathering conversation before the user returns.
+
+### 9. Confirm the completed sync when the user returns
+
+When the user returns and says the web sync is finished, first confirm that it completed. Inspect the selected `Financial Data Warehouse` for its recent sync status when the current surface can do so; otherwise ask the user for the web skill's completion summary. Continue when the sync completed successfully, including a completed run that reports coverage gaps or unsupported accounts. If it failed, is still running, or cannot be confirmed, explain that the financial record is not ready for the next step and direct the user back to the web sync.
+
+Do not treat an unavailable or unsupported connection as a zero balance, a closed account, or evidence that an asset does not exist. Do not describe the household as fully set up until the web skill confirms a successful sync. Do not expose unnecessary folder IDs, spreadsheet IDs, account numbers, audit hashes, raw provider IDs, or internal tab names.
+
+### 10. Guide the supporting-document handoff
+
+Once the completed sync is confirmed, explain that connected account data covers only what Finances could retrieve. The household should now gather copies of the documents and valuations that fill the gaps. Present this concise, clearly labeled handoff, using the existing folders rather than creating or renaming anything:
+
+- **Transactional Data** — recent statements or exports for bank, credit-card, loan, investment, retirement, or other accounts that could not be connected through Finances. Include the account name and statement date; do not ask for logins or passwords.
+- **Cash & Manual Spending** — optional cash-withdrawal notes, cash budgets, receipts, or a simple spending log that explains what cash withdrawals funded. A checking-account withdrawal funds cash; it is not, by itself, evidence of a spending category. If this folder is absent because the household record predates it, ask for permission before creating it.
+- **Benefits & Insurance** — employer benefits guides, health-plan details, HSA/FSA information, and life, disability, home, auto, and umbrella insurance policies or declarations.
+- **Debt & Credit** — mortgage, loan, line-of-credit, and credit-card statements; payoff or amortization information; and refinancing records.
+- **Estate & Legal** — wills, trusts, healthcare directives or proxies, powers of attorney, and other household legal records the user wants stored.
+- **Investments & Retirement** — IRA, 401(k), pension, brokerage, stock-plan, and other retirement or investment statements, including plan or cost-basis records when available.
+- **Property & Vehicles** — property deeds and mortgage-related records. Ask whether the user wants to document a current home value and let them choose the source: an online estimate such as Zillow or another real-estate service, a broker estimate, tax assessment, or appraisal are all reasonable options. Save the source and date with the record. Add vehicle titles or registration, insurance records, and a current dated valuation source if the user wants one.
+
+Tell the user that they can upload only the records they are comfortable keeping in Drive, now or later; these documents are for their private record and future Personal CFO work. Do not request credentials, passwords, or documents the user does not want stored.
+
+Ask which category they want to start with. Work through one category at a time: name the destination folder, repeat the relevant examples above, ask the user to upload or note any unavailable records, and then offer the next category. Preserve all existing files and keep the user in control of what is uploaded.
 
 ## Ongoing use
 

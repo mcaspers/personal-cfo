@@ -10,6 +10,10 @@ Use connected financial sources for current accounts, balances, transactions, re
 
 Resolve the household's top-level budget-and-financial-information folder from an ID or Drive link the user gave in this chat. If none was provided, search connected Google Drive for the exact native Google Doc named `Personal CFO Home`, read its active folder ID, and verify the document belongs to that folder. Preserve this grounding document; do not delete, move, or overwrite it. Treat the resolved folder as the scope for uploaded files and supporting documents, and its exact `Transactional Data` subfolder as the scope for the warehouse and sync exports. If no valid locator or `Transactional Data` folder exists, or more than one valid locator exists, ask the user to identify the intended folder. Do not guess.
 
+### Lifestyle baseline
+
+Before interpreting transactions or related household records, look in the resolved top-level folder for the exact native Google Doc `Personal CFO Lifestyle Baseline`. If exactly one exists, read it as labeled user-provided context. If it is missing, continue without one; if more than one exists, ask the user which is active. Apply a rule only when the record fits its stated scope, leave mismatches as ambiguous, and never use it to overwrite synced data or replace source evidence for balances, benefits, insurance, tax, legal, or investment facts.
+
 The user's financial handoff must come from the resolved `Transactional Data` folder. Before analysis, inspect that folder and use the newest active native Google Sheet named `Financial Data Warehouse` as the canonical warehouse. Also locate the newest dated `Financial Warehouse Sync - YYYY-MM-DD` sheet there as the latest export snapshot. Do not rely on a global title search when a folder-scoped lookup is available.
 
 ### Provenance confirmation gate
