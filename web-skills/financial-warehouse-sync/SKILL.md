@@ -23,11 +23,11 @@ Report the result in plain language without displaying account numbers, balances
 
 Do not create, initialize, modify, or populate the workbook until the user gives an explicit affirmative answer in this web chat. A confirmation given earlier to the desktop setup plugin does not satisfy this gate.
 
-### Scheduled monthly runs
+### Scheduled runs
 
-For a scheduled ChatGPT task, the task's saved instruction may serve as the explicit confirmation only when it clearly authorizes a recurring, non-destructive sync into the existing `Financial Data Warehouse` resolved through `Personal CFO Home` and `Transactional Data`. Perform the same read-only Finances and Drive checks first. If either connection is unavailable, the location is ambiguous, the worksheet is missing, or the worksheet does not have the expected parent folder, do not write; report the condition for the user to resolve.
+For a scheduled ChatGPT task, the task's saved instruction may serve as the explicit confirmation only when it clearly authorizes a recurring, non-destructive sync into the existing `Financial Data Warehouse` resolved through `Personal CFO Home` and `Transactional Data`. The household chooses its cadence in Scheduled; do not infer a cadence. Perform the same read-only Finances and Drive checks first. If either connection is unavailable, the location is ambiguous, the worksheet is missing, or the worksheet does not have the expected parent folder, do not write; report the condition for the user to resolve.
 
-Never infer recurring write permission from a generic reminder, a desktop-setup confirmation, or an earlier chat. A scheduled task must never create a replacement folder or workbook.
+Never infer recurring write permission from a generic reminder, a desktop-setup confirmation, or an earlier chat. A scheduled task must never create a replacement folder or workbook. Its outcome is limited to the warehouse sync and a plain-language status report; it does not update `Personal CFO Household Context`, classify transactions, or conduct a lifestyle or financial-plan review.
 
 If Finances is not connected, has not finished syncing, or cannot return a read-only availability check, stop and tell the user to finish or wait for the Finances sync. Do not write an empty financial import and do not describe the record as ready. If Drive cannot resolve exactly one intended folder and workbook, stop and ask the user for its link.
 

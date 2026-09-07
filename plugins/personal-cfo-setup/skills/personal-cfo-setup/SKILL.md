@@ -131,7 +131,9 @@ Ask which category they want to start with. Work through one category at a time:
 
 ## Ongoing use
 
-Explain the system in one short paragraph: the private record lives in the user's Drive; connected Finances data is synced into it from ChatGPT on the web; and the other Personal CFO tools automatically look for `Personal CFO Home` when a new chat does not already identify the folder. Ask before creating a recurring refresh schedule.
+Explain the system in one short paragraph: the private record lives in the user's Drive; connected Finances data is synced into it from ChatGPT on the web; and the other Personal CFO tools automatically look for `Personal CFO Home` when a new chat does not already identify the folder. Recommend an initial Lifestyle Review before ongoing maintenance, because it establishes the household context used to interpret later data.
+
+After that review, offer an optional recurring data refresh—not a recurring review. Ask whether the user wants an automatic refresh and, only if they do, ask them to choose weekly, monthly, quarterly, yearly, or a custom cadence. Direct them to create a separate task in [ChatGPT Scheduled](https://chatgpt.com/scheduled) on the web using Financial Warehouse Sync. The saved task must authorize only a non-destructive sync into the existing warehouse resolved by `Personal CFO Home`; it must report connection or location problems instead of writing. It refreshes connected transaction data only. It does not update Household Context, classify transactions, gather documents, or perform a financial-plan review. Do not create a schedule from this desktop setup conversation without explicit user approval.
 
 ## Safety boundaries
 

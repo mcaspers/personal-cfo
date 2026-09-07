@@ -73,6 +73,8 @@ Summarize:
 2. **Confirmed household context and rules** — only information the user approved for future use.
 3. **Open questions or data gaps** — including freshness, source status, and deferred classifications.
 
-Offer user-selected next steps only when helpful, such as reviewing a category in a future period, checking whether a recurring charge is expected, or preparing a separate household report. Frame these as choices, not individualized financial, investment, tax, legal, or insurance instructions. Ask before creating a recurring review.
+Offer user-selected next steps only when helpful, such as reviewing a category in a future period, checking whether a recurring charge is expected, or preparing a separate household report. Frame these as choices, not individualized financial, investment, tax, legal, or insurance instructions.
+
+After an initial Lifestyle Review, offer an **optional recurring data refresh**. Explain that it keeps the existing transaction warehouse current; it is separate from this review and will not change Household Context, classify transactions, gather documents, or make financial-plan decisions. Ask whether the user wants one. If yes, let them choose weekly, monthly, quarterly, yearly, or a custom cadence, then direct them to create a standalone task in [ChatGPT Scheduled](https://chatgpt.com/scheduled) on the web using Financial Warehouse Sync. The scheduled task must explicitly authorize only a non-destructive sync into the existing `Financial Data Warehouse` located through `Personal CFO Home`, and must report a connection or location problem without writing. Do not create a recurring review or scheduled write without explicit user approval.
 
 Tell the user: “To update your household context later, rerun Personal CFO Lifestyle Review. The confirmed changes will update the same `Personal CFO Household Context` document for the other Personal CFO plugins to use.”

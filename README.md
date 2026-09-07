@@ -82,25 +82,26 @@ That is it. Your private financial record is stored in your Google Drive. You ca
 
 After a successful sync, install **Personal CFO Lifestyle Review** from the Personal CFO marketplace in the desktop app. Start a new task and say: `Review the lifestyle patterns in my Personal CFO transactions.` The skill walks through spending categories one at a time, treats cash withdrawals as funding rather than assumed expenses, surfaces ambiguous classifications, and asks how future matching transactions should be treated. It can also capture optional household explanations for seasonal variation—such as heating, cooling, holidays, travel, school, or camp—without requiring personal details. Conversation is the normal input: with your approval, the agent saves confirmed context in `Personal CFO Household Context` at the top of your private folder so later Personal CFO work can use it. You may add or revise household-contact notes there yourself if you prefer. Rerun Lifestyle Review whenever the context changes; it refreshes the same document for the other plugins.
 
-### Optional: refresh your data every month
+### Optional: keep your data current automatically
 
-After the first sync succeeds, you can have ChatGPT refresh the existing warehouse automatically each month.
+After your first Lifestyle Review, you can have ChatGPT refresh the existing warehouse on a cadence you choose. Monthly is a practical default for most households; quarterly or yearly can fit a less-frequent check-in, and a custom cadence is fine when it matches how you use Personal CFO. This refreshes connected transaction data only—it does not change `Personal CFO Household Context`, classify transactions, or make financial-plan decisions.
 
-1. In ChatGPT on the web, open [Scheduled](https://chatgpt.com/scheduled) and create a new task. Choose a time that works for you, such as the first day of each month at 9:00 AM.
-2. Confirm that **Google Drive** and **Finances** are still connected in ChatGPT on the web. A scheduled task cannot sync if either connection needs attention.
-3. Give the task a non-sensitive name such as `Monthly Personal CFO refresh`, then paste these instructions:
+1. Choose how often you want refreshed data: weekly, monthly, quarterly, yearly, or a custom cadence.
+2. In ChatGPT on the web, open [Scheduled](https://chatgpt.com/scheduled) and create a new task with that cadence and a time that works for you.
+3. Confirm that **Google Drive** and **Finances** are still connected in ChatGPT on the web. A scheduled task cannot sync if either connection needs attention.
+4. Give the task a non-sensitive name such as `Personal CFO data refresh`, then paste these instructions:
 
    ```text
-   Every month, run Financial Warehouse Sync using my connected Finances and Google Drive. Resolve my active household location through Personal CFO Home. Synchronize only into the existing Financial Data Warehouse inside that location's Transactional Data folder.
+   At this task's scheduled cadence, run Financial Warehouse Sync using my connected Finances and Google Drive. Resolve my active household location through Personal CFO Home. Synchronize only into the existing Financial Data Warehouse inside that location's Transactional Data folder.
 
    I authorize this scheduled task to write my financial data only to that existing spreadsheet. Use the normal non-destructive delta sync: preserve manual records and stale last-known data, never treat a connector problem as zero, and never clear history or create a replacement folder or workbook. If Finances or Google Drive is unavailable, the destination is ambiguous, or the workbook is not in Transactional Data, do not write. Tell me what needs attention instead.
 
-   Report whether the sync succeeded, what data was updated, any connector warnings, and whether another full sync is recommended.
+   Report whether the sync succeeded, the date coverage and data updated, any connector warnings, and whether another full sync is recommended. Do not update Personal CFO Household Context or perform a lifestyle review or financial-plan review.
    ```
 
-4. Review the task's instructions and schedule, then save it. Check its first result before relying on it.
+5. Review the task's instructions and schedule, then save it. Check its first result before relying on it.
 
-Do not put spreadsheet IDs, folder IDs, balances, account numbers, or other sensitive details in a scheduled task's name or instructions. `Personal CFO Home` lets the task find the right household location without them. You can review, pause, edit, or delete the task from [Scheduled](https://chatgpt.com/scheduled). See OpenAI's [Scheduled tasks guide](https://help.openai.com/en/articles/10291617) for current availability, limits, and notification settings.
+Do not put spreadsheet IDs, folder IDs, balances, account numbers, or other sensitive details in a scheduled task's name or instructions. `Personal CFO Home` lets the task find the right household location without them. You can review, pause, edit, or delete the task from [Scheduled](https://chatgpt.com/scheduled). Rerun Lifestyle Review when your household context changes. Financial Plan will later use the refreshed data and Household Context as separate inputs. See OpenAI's [Scheduled tasks guide](https://help.openai.com/en/articles/10291617) for current availability, limits, and notification settings.
 
 ## If you cannot find “Add a marketplace”
 
