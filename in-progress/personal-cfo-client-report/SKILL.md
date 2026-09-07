@@ -1,6 +1,6 @@
 ---
 name: personal-cfo-client-report
-description: Generate a source-labeled household financial report using connected financial data and verified Drive sources.
+description: In-progress concept: generate a source-labeled household financial report using connected financial data and verified Drive sources.
 ---
 # Personal CFO Report
 

@@ -1,6 +1,6 @@
 ---
 name: personal-cfo-client-review
-description: Prepare a decision-oriented monthly or quarterly household financial review.
+description: In-progress concept: prepare a decision-oriented monthly or quarterly household financial review.
 ---
 # Personal CFO Review
 

@@ -48,17 +48,7 @@ Plugin availability depends on your plan, workspace settings, and which features
    ```
 
 5. Add the marketplace. A new **Personal CFO** marketplace will appear in your Plugins list.
-6. Return to the main **Plugins** tab. Open the Personal CFO marketplace and click the **+** button beside each **Personal CFO** plugin you want to use. You must do this one plugin at a time. For a complete first test, add all of them:
-
-   - Personal CFO Setup
-   - Personal CFO Data Layer
-   - Personal CFO Report
-   - Personal CFO Review
-   - Personal CFO Financial Plan
-   - Personal CFO Portfolio Review
-   - Personal CFO Investment Options
-   - Personal CFO Tax Review
-   - Personal CFO Lifestyle Review
+6. Return to the main **Plugins** tab. Open the Personal CFO marketplace and click the **+** button beside **Personal CFO Setup**. After your first successful sync, add **Personal CFO Lifestyle Review** when you are ready to understand the patterns behind your spending.
 
    Adding a marketplace only makes its plugins available. It does **not** automatically add them to ChatGPT.
 
@@ -86,7 +76,7 @@ Plugin availability depends on your plan, workspace settings, and which features
 9. Start a new web chat, run **Financial Warehouse Sync**, and say: `Sync my connected financial data into the Financial Data Warehouse in my Personal CFO folder.` Provide the folder or spreadsheet link if asked. The web skill first checks whether Finances is ready, then asks for your final confirmation before it writes anything.
 10. When Financial Warehouse Sync reports that it has completed, return to the same Personal CFO Setup conversation in the desktop app. Setup confirms the completed sync, then helps you gather the records that connected accounts cannot provide: statements for unconnected accounts, benefits and insurance information, debt records, estate documents, investment and retirement records, and current dated home and vehicle valuations. Upload only the documents you are comfortable keeping in your private Drive folders.
 
-That is it. Your private financial record is stored in your Google Drive, and you can return later for a fuller review, report, plan, portfolio review, or tax-preparation worksheet.
+That is it. Your private financial record is stored in your Google Drive. You can return later to refresh it or update your household context.
 
 ### Optional: understand the patterns behind your spending
 
@@ -140,8 +130,8 @@ codex plugin add personal-cfo-setup@personal-cfo
 
 Start a new Codex task after installation, then ask: `Set up my Personal CFO financial home.`
 
-The marketplace catalog is [`.agents/plugins/marketplace.json`](.agents/plugins/marketplace.json). The `plugins/` directory contains Personal CFO Setup plus the optional advanced workflows.
+The marketplace catalog is [`.agents/plugins/marketplace.json`](.agents/plugins/marketplace.json). Only the packaged workflows in `plugins/` are generally available through the marketplace. The separate `in-progress/` directory preserves future workflow concepts and is deliberately not installable.
 
-## Advanced options
+## In-progress workflows
 
-After setup, Personal CFO can also create a household report, period-over-period review, financial plan, portfolio review, investment-options memo, or tax-review worksheet. These are optional; start with Personal CFO Setup.
+Future workflow concepts, including Financial Plan, are kept in [`in-progress/`](in-progress/) while they are designed and tested. They are not listed in the marketplace and cannot be installed from it.

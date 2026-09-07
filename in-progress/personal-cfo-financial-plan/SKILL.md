@@ -1,6 +1,6 @@
 ---
 name: personal-cfo-financial-plan
-description: Build or update an assumption-driven household financial plan with cash-flow, debt, goal, and retirement scenarios.
+description: In-progress concept: build or update an assumption-driven household financial plan with cash-flow, debt, goal, and retirement scenarios.
 ---
 # Personal CFO Financial Plan
 

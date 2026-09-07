@@ -1,6 +1,6 @@
 ---
 name: personal-cfo-data-layer
-description: Build a source-aware household financial model from connected financial data and the user's Google Drive materials.
+description: In-progress concept: build a source-aware household financial model from connected financial data and the user's Google Drive materials.
 ---
 # Personal CFO Data Layer
 

@@ -1,6 +1,6 @@
 ---
 name: personal-cfo-tax-review
-description: Prepare a tax-professional review worksheet from financial and Drive data without making tax determinations.
+description: In-progress concept: prepare a tax-professional review worksheet from financial and Drive data without making tax determinations.
 ---
 # Personal CFO Tax Review
 
