@@ -43,7 +43,7 @@ Spreadsheet URL:
 `https://docs.google.com/spreadsheets/d//edit`
 
 Expected warehouse schema version: `v2`.
-Current sync skill version: `v2.5-portable`.
+Current sync skill version: `v2.6-portable`.
 
 Never create a replacement workbook during a normal sync.
 Never accept a trashed warehouse as canonical.
@@ -314,7 +314,7 @@ For a new warehouse:
 - `last_successful_sync` starts blank;
 - `last_full_reconcile` starts blank;
 - `schema_version` is `v2`;
-- `skill_version` is `v2.5-portable`.
+- `skill_version` is `v2.6-portable`.
 - `checkpoint` starts blank.
 
 ### Initialize Sync_Runs
@@ -512,6 +512,18 @@ Before comparing:
 - do not replace a higher-precision timestamp with a lower-precision date;
 - serialize nested JSON deterministically before comparison;
 - preserve raw/provider values separately when normalized equivalents also exist.
+
+### Destination cell types
+
+Write every destination cell with its semantic Google Sheets type. Keep provider IDs, labels, dates, timestamps, JSON, categories, and status fields as strings. Preserve identifiers as strings even when they contain only digits.
+
+Write valid financial measures as numeric cells, not numeric-looking text. This includes `Transactions.amount`; all quantity, amount, price, fee, value, cost-basis, balance, limit, payment, rate, escrow, and term fields in the other managed datasets; and the recurring-stream amount fields. Parse a source value such as `"8.45"` to the number `8.45` during normalization. Leave unavailable numeric values blank/null.
+
+Write `Transactions.pending`, `Recurring_Streams.is_active`, and other true/false fields as boolean cells.
+
+When the Sheets write interface exposes typed values, use `numberValue` for a number and `boolValue` for a boolean. Use `stringValue` only for a semantically textual field. A leading apostrophe is text-entry syntax, so numeric writes must pass the parsed number directly rather than a quoted or apostrophe-prefixed representation.
+
+After each dataset write, re-read representative inserted and updated cells with their effective values. A numeric destination column must return `numberValue`, and a boolean destination column must return `boolValue`. If a typed value is returned as `stringValue`, mark that dataset failed, leave its checkpoint unchanged, and report the cell-type mismatch.
 
 ### Material-change comparison exclusions
 
@@ -860,7 +872,7 @@ For current-state tables:
 Version the warehouse schema and the sync implementation independently.
 
 - `warehouse_schema_version` / `Sync_State.schema_version` = `v2`
-- current `skill_version` = `v2.5-portable`
+- current `skill_version` = `v2.6-portable`
 
 A skill-version change does not imply a warehouse schema migration.
 A warehouse schema version changes only when the physical/control-table contract changes incompatibly or requires a real schema migration.
@@ -930,6 +942,7 @@ After every dataset write:
 - confirm disconnected/erroring source last-known balances remain when connector is unhealthy;
 - confirm all existing manual/unsupported-provider account and asset rows remain;
 - verify no `legacy_unkeyed` recurring rows remain after a successful legacy migration.
+- confirm representative inserted and updated numeric and boolean cells retain their required effective cell types.
 
 ## Hard prohibitions
 

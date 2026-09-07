@@ -58,6 +58,7 @@ Plugin availability depends on your plan, workspace settings, and which features
    - Personal CFO Portfolio Review
    - Personal CFO Investment Options
    - Personal CFO Tax Review
+   - Personal CFO Lifestyle Review
 
    Adding a marketplace only makes its plugins available. It does **not** automatically add them to ChatGPT.
 
@@ -86,6 +87,10 @@ Plugin availability depends on your plan, workspace settings, and which features
 10. The web skill's completion summary tells you what data it found and whether the shared Personal CFO location is ready for the other plugins.
 
 That is it. Your private financial record is stored in your Google Drive, and you can return later for a fuller review, report, plan, portfolio review, or tax-preparation worksheet.
+
+### Optional: understand the patterns behind your spending
+
+After a successful sync, install **Personal CFO Lifestyle Review** from the Personal CFO marketplace in the desktop app. Start a new task and say: `Review the lifestyle patterns in my Personal CFO transactions.` The skill reads the transaction history, highlights a few supported patterns, and asks about them one at a time. Your explanations stay in the chat unless you explicitly ask to save them.
 
 ### Optional: refresh your data every month
 
