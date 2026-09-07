@@ -4,9 +4,9 @@ This context defines the shared household-record concepts used by Personal CFO p
 
 ## Language
 
-**Personal CFO Lifestyle Baseline**:
-The single native Google Doc in a household's top-level Personal CFO folder that records user-confirmed, reusable category, cash, seasonal, and transaction-classification context. Lifestyle Review refreshes it in place; it is user-provided interpretive context, not financial source evidence.
-_Avoid_: lifestyle profile, transaction memory
+**Personal CFO Household Context**:
+The single native Google Doc in a household's top-level Personal CFO folder that records user-confirmed, reusable category, cash, seasonal, household-contact, and transaction-classification context. Conversation with a Personal CFO workflow is the standard way to add or update it; the agent writes confirmed details after approval. A household may also add or revise its own contact or context notes directly. Lifestyle Review refreshes the relevant context in place; it is interpretive context, not financial source evidence.
+_Avoid_: lifestyle profile, transaction memory, manual ledger
 
 **User-confirmed classification rule**:
 A reusable instruction for future transactions matching a stated merchant or description pattern, including its treatment, scope, and exceptions. It does not alter the synced provider category.
@@ -17,7 +17,7 @@ An expense whose current category or transaction details do not support one clea
 _Avoid_: uncategorized expense, guessed category
 
 **Cash & Manual Spending**:
-The household category for cash-funding transactions and the optional receipts or spending records that explain them. A cash withdrawal funds spending and is not itself a classified expense without user-provided evidence.
+The household category for cash-funding transactions and optional uploaded receipts or other supporting documents. A cash withdrawal funds spending and is not itself a classified expense without user-provided evidence. The household can explain cash use in conversation; it never needs to maintain a separate manual log.
 _Avoid_: cash expense, ATM category
 
 **Seasonal pattern**:

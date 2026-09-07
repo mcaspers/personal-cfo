@@ -32,7 +32,7 @@ Once the folder ID and locator are confirmed, integration is complete. Do not as
 
 This step is for a new household setup only.
 
-Ask the user to connect Google Drive when it is not already connected. Explain that it stores the user's private financial record, supporting documents, and history.
+When Google Drive is not connected, direct the user to open the desktop app's **Plugins** area, add or enable **Google Drive**, and complete the Google sign-in and permission screens. Link to [Google Drive app and setup in ChatGPT](https://help.openai.com/en/articles/10929079-google-drive-app-and-setup-in-chatgpt) for step-by-step help. Explain that it stores the user's private financial record, supporting documents, and history; their data remains in their connected accounts and Drive, subject to the permissions they approve. Then stop and ask the user to confirm when Google Drive is connected. Do not ask for a Drive location until they confirm.
 
 Do not ask the user to connect Finances in the desktop app. The first live import happens in ChatGPT on the web, where the user connects Finances later.
 
@@ -66,7 +66,7 @@ Before creating files, summarize the selected Drive location and whether the use
 Inside the selected top-level folder, create these folders only when they do not already exist. Preserve any existing folders and organization.
 
 - `Transactional Data` — exported statements, transaction files, and other day-to-day financial records.
-- `Cash & Manual Spending` — cash-withdrawal notes, cash budgets, receipts, and other spending that connected accounts cannot categorize.
+- `Cash & Manual Spending` — optional receipts and other supporting documents for cash spending or spending that connected accounts cannot categorize. The household can explain cash use in conversation; no separate manual log is required.
 - `Benefits & Insurance` — employer benefits, health coverage, life insurance, home, auto, and umbrella policies.
 - `Debt & Credit` — loan, mortgage, credit-card, refinancing, and payoff records.
 - `Estate & Legal` — trusts, wills, healthcare proxies, powers of attorney, and other legal documents.
@@ -87,12 +87,14 @@ Do not retrieve, analyze, or import financial-account data in this desktop setup
 
 ### 7. Create the Personal CFO Home locator
 
-After the Drive location and spreadsheet are resolved, create or update one native Google Doc inside the selected top-level budget-and-financial-information folder named `Personal CFO Home`. It contains only:
+After the Drive location and spreadsheet are resolved, explain that Setup will create a small `Personal CFO Home` document in the selected top-level folder. It is the durable locator that future Personal CFO tools use to find this household's private financial record; it is not a report or a place to keep household notes.
+
+Create or update one native Google Doc inside the selected top-level budget-and-financial-information folder named `Personal CFO Home`. It contains only:
 
 - `Active Personal CFO folder ID: <folder ID>`
 - `Active Personal CFO folder URL: <folder URL>`
 
-Verify the document is in the selected top-level folder. This locator is not a financial report and must not contain balances, transactions, account numbers, or credentials. It is the durable grounding document that future Personal CFO plugins resolve when a chat does not already identify the household location. Tell the user not to delete it. That resolved top-level folder is their working scope; its `Transactional Data` subfolder contains the warehouse, while the other subfolders hold uploaded supporting documents.
+Verify the document is in the selected top-level folder. This locator is not a financial report and must not contain balances, transactions, account numbers, credentials, or lifestyle notes. Show the user its link and say: “`Personal CFO Home` is the small durable document that lets future Personal CFO tools find this household folder. Please do not edit its contents, rename it, move it, or delete it.” That resolved top-level folder is their working scope; its `Transactional Data` subfolder contains the warehouse, while the other subfolders hold uploaded supporting documents.
 
 ### 8. Hand off the first live sync to ChatGPT on the web
 
@@ -116,14 +118,14 @@ Do not treat an unavailable or unsupported connection as a zero balance, a close
 Once the completed sync is confirmed, explain that connected account data covers only what Finances could retrieve. The household should now gather copies of the documents and valuations that fill the gaps. Present this concise, clearly labeled handoff, using the existing folders rather than creating or renaming anything:
 
 - **Transactional Data** — recent statements or exports for bank, credit-card, loan, investment, retirement, or other accounts that could not be connected through Finances. Include the account name and statement date; do not ask for logins or passwords.
-- **Cash & Manual Spending** — optional cash-withdrawal notes, cash budgets, receipts, or a simple spending log that explains what cash withdrawals funded. A checking-account withdrawal funds cash; it is not, by itself, evidence of a spending category. If this folder is absent because the household record predates it, ask for permission before creating it.
+- **Cash & Manual Spending** — optional receipts or other supporting documents that help explain cash withdrawals. A checking-account withdrawal funds cash; it is not, by itself, evidence of a spending category. Ask the household to explain ordinary cash use in the conversation when useful; the relevant Personal CFO workflow records a confirmed reusable treatment. Do not ask the household to create a cash log, spreadsheet, or other manual ledger. If this folder is absent because the household record predates it, ask for permission before creating it.
 - **Benefits & Insurance** — employer benefits guides, health-plan details, HSA/FSA information, and life, disability, home, auto, and umbrella insurance policies or declarations.
 - **Debt & Credit** — mortgage, loan, line-of-credit, and credit-card statements; payoff or amortization information; and refinancing records.
 - **Estate & Legal** — wills, trusts, healthcare directives or proxies, powers of attorney, and other household legal records the user wants stored.
 - **Investments & Retirement** — IRA, 401(k), pension, brokerage, stock-plan, and other retirement or investment statements, including plan or cost-basis records when available.
 - **Property & Vehicles** — property deeds and mortgage-related records. Ask whether the user wants to document a current home value and let them choose the source: an online estimate such as Zillow or another real-estate service, a broker estimate, tax assessment, or appraisal are all reasonable options. Save the source and date with the record. Add vehicle titles or registration, insurance records, and a current dated valuation source if the user wants one.
 
-Tell the user that they can upload only the records they are comfortable keeping in Drive, now or later; these documents are for their private record and future Personal CFO work. Do not request credentials, passwords, or documents the user does not want stored.
+Tell the user that they can upload only the records they are comfortable keeping in Drive, now or later; these documents are optional evidence for their private record and future Personal CFO work. Conversation with the agent is the standard way to provide context or answer questions; the agent writes any confirmed structured context under the hood. Do not ask the user to maintain a spreadsheet, ledger, or other structured file. Do not request credentials, passwords, or documents the user does not want stored.
 
 Ask which category they want to start with. Work through one category at a time: name the destination folder, repeat the relevant examples above, ask the user to upload or note any unavailable records, and then offer the next category. Preserve all existing files and keep the user in control of what is uploaded.
 
