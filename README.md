@@ -48,7 +48,7 @@ Plugin availability depends on your plan, workspace settings, and which features
    ```
 
 5. Add the marketplace. A new **Personal CFO** marketplace will appear in your Plugins list.
-6. Return to the main **Plugins** tab. Open the Personal CFO marketplace and click the **+** button beside **Personal CFO Setup**. After your first successful sync, add **Personal CFO Lifestyle Review** when you are ready to understand the patterns behind your spending.
+6. Return to the main **Plugins** tab. Open the Personal CFO marketplace and click the **+** button beside **Personal CFO Setup**. After your first successful sync, add **Personal CFO Lifestyle Review** when you are ready to understand the patterns behind your spending. Add **Personal CFO Financial Plan** when you are ready to turn those patterns and your objectives into a working plan.
 
    Adding a marketplace only makes its plugins available. It does **not** automatically add them to ChatGPT.
 
@@ -81,6 +81,10 @@ That is it. Your private financial record is stored in your Google Drive. You ca
 ### Optional: understand the patterns behind your spending
 
 After a successful sync, install **Personal CFO Lifestyle Review** from the Personal CFO marketplace in the desktop app. Start a new task and say: `Review the lifestyle patterns in my Personal CFO transactions.` The skill walks through spending categories one at a time, treats cash withdrawals as funding rather than assumed expenses, surfaces ambiguous classifications, and asks how future matching transactions should be treated. It can also capture optional household explanations for seasonal variation—such as heating, cooling, holidays, travel, school, or camp—without requiring personal details. Conversation is the normal input: with your approval, the agent saves confirmed context in `Personal CFO Household Context` at the top of your private folder so later Personal CFO work can use it. You may add or revise household-contact notes there yourself if you prefer. Rerun Lifestyle Review whenever the context changes; it refreshes the same document for the other plugins.
+
+### Optional: turn your objectives into a financial plan
+
+After your first Lifestyle Review, install **Personal CFO Financial Plan** and start a new task: `Create a financial plan from my Personal CFO household record.` It begins by asking what financial objectives matter for this working session, then uses your synced data, uploaded records, and Household Context to examine the current position and a small set of relevant alternatives. It may offer to create a budget when that would help an objective, but a budget is optional. With your approval, it maintains one root-level `Personal CFO Financial Plan` document that records current objectives, evidence and gaps, assumptions, budget status, scenarios, decisions, and optional follow-up. This is a planning aid, not financial, investment, tax, legal, insurance, or other professional advice.
 
 ### Optional: keep your data current automatically
 

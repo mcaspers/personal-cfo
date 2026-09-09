@@ -115,7 +115,7 @@ Do not treat an unavailable or unsupported connection as a zero balance, a close
 
 ### 10. Guide the supporting-document handoff
 
-Once the completed sync is confirmed, explain that connected account data covers only what Finances could retrieve. The household should now gather copies of the documents and valuations that fill the gaps. Present this concise, clearly labeled handoff, using the existing folders rather than creating or renaming anything:
+Once the completed sync is confirmed, explain that connected account data covers only what Finances could retrieve. Say plainly: “Please now populate the folders in your Personal CFO home with the current statements, documents, and valuations that Finances could not supply. We’ll go through them one at a time.” The household should gather copies of the documents and valuations that fill those gaps. Use the existing folders rather than creating or renaming anything:
 
 - **Transactional Data** — recent statements or exports for bank, credit-card, loan, investment, retirement, or other accounts that could not be connected through Finances. Include the account name and statement date; do not ask for logins or passwords.
 - **Cash & Manual Spending** — optional receipts or other supporting documents that help explain cash withdrawals. A checking-account withdrawal funds cash; it is not, by itself, evidence of a spending category. Ask the household to explain ordinary cash use in the conversation when useful; the relevant Personal CFO workflow records a confirmed reusable treatment. Do not ask the household to create a cash log, spreadsheet, or other manual ledger. If this folder is absent because the household record predates it, ask for permission before creating it.
@@ -127,7 +127,7 @@ Once the completed sync is confirmed, explain that connected account data covers
 
 Tell the user that they can upload only the records they are comfortable keeping in Drive, now or later; these documents are optional evidence for their private record and future Personal CFO work. Conversation with the agent is the standard way to provide context or answer questions; the agent writes any confirmed structured context under the hood. Do not ask the user to maintain a spreadsheet, ledger, or other structured file. Do not request credentials, passwords, or documents the user does not want stored.
 
-Ask which category they want to start with. Work through one category at a time: name the destination folder, repeat the relevant examples above, ask the user to upload or note any unavailable records, and then offer the next category. Preserve all existing files and keep the user in control of what is uploaded.
+Ask which category they want to start with. Work through one category at a time: name the destination folder, repeat the relevant examples above, explicitly ask the user to obtain and upload the current documents that apply, and then record whether the category is populated, has no applicable records, or is deferred. For an unconnected account, explicitly ask the user to obtain and upload its most recent statement or export to `Transactional Data`. Then offer the next category. Preserve all existing files and keep the user in control of what is uploaded.
 
 ## Ongoing use
 
