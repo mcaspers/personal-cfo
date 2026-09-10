@@ -1,12 +1,17 @@
 {
   "name": "personal-cfo-setup",
-  "version": "0.1.0",
+  "version": "0.1.0+codex.20260910012139",
   "description": "Guides a household through creating a private Google Drive home for its financial information.",
   "author": {
     "name": "mcaspers"
   },
   "license": "MIT",
-  "keywords": ["personal finance", "onboarding", "financial data", "household"],
+  "keywords": [
+    "personal finance",
+    "onboarding",
+    "financial data",
+    "household"
+  ],
   "skills": "./skills/",
   "interface": {
     "displayName": "Personal CFO Setup",
@@ -15,7 +20,9 @@
     "developerName": "mcaspers",
     "category": "Productivity",
     "capabilities": [],
-    "defaultPrompt": ["Set up my Personal CFO financial home."]
+    "defaultPrompt": [
+      "Set up my Personal CFO financial home."
+    ]
   },
   "apps": "./.app.json"
 }

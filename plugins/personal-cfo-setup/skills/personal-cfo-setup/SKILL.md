@@ -42,24 +42,21 @@ Never ask the user to paste account numbers, passwords, or sensitive credentials
 
 This step is for a new household setup only.
 
-Ask one simple question: "Would you like me to create a `Personal CFO Data` folder in Google Drive, or use an existing folder?"
+Ask one simple question: “Would you like me to create a new Personal CFO folder in Google Drive, or use an existing folder?” Do not introduce internal folder names or the spreadsheet in this first choice.
 
-Before creating a folder, look in the selected Drive location for an active folder named exactly `Personal CFO Data`.
+If the user chooses an existing folder, ask them to select or link it and use that explicit selection. If they choose a new folder, look for an active `Personal CFO Data` folder in their Drive first.
 
-- If exactly one exists, offer to use it. Do not create another folder with that name.
-- If none exists, create one only after the user confirms the location.
-- If more than one exists, stop and ask which one is the household's active record. Prefer the folder that already contains `Personal CFO Home` or `Financial Data Warehouse`, but do not choose or delete a folder silently.
-- If Setup created an empty duplicate during the current chat, identify the chosen authoritative folder, then ask for explicit permission before moving that empty duplicate to Trash. Never delete a folder that contains files, a worksheet, or a `Personal CFO Home` locator.
+- If none exists, create `Personal CFO Data`. The user's clear choice is the authorization to create it; do not ask a second time.
+- If exactly one exists, offer the meaningful choice: use that existing record or create a separate new one.
+- If more than one exists, ask which is the household's active record. Prefer the folder that already contains `Personal CFO Home` or `Financial Data Warehouse`, but do not choose or delete a folder silently.
 
-If the user chooses an existing folder, ask them to select or link it. If they choose a new folder, confirm that it will contain a `Transactional Data` folder with a spreadsheet named `Financial Data Warehouse`, plus their supporting records. Do not expose IDs or require the user to edit configuration.
-
-Then ask: "Do you already have a Google Sheet you want to use as your financial record?" If yes, ask them to share or paste its Google Sheet link and confirm it belongs in the selected folder's `Transactional Data` folder. If no, explain that Setup will create `Financial Data Warehouse` there.
+Do not ask every user to choose a spreadsheet. After the folder is resolved and its `Transactional Data` folder exists, reuse exactly one active native Google Sheet named `Financial Data Warehouse` when present; create the standard sheet when none exists; and ask the user to choose only if multiple matching sheets exist. Use a different existing Google Sheet only when the user explicitly offers its link. Do not expose IDs or require the user to edit configuration.
 
 ### 4. Confirm the private location
 
 This step is for a new household setup only.
 
-Before creating files, summarize the selected Drive location and whether the user chose a new or existing Google Sheet. Ask for confirmation that it is their intended household location. Reuse confirmation already given in the same thread.
+When the user supplied an exact existing-folder link or chose a newly created folder, state the selected location in plain language and proceed; their choice already confirms it. Ask a location question only when Drive results are ambiguous or the user has named more than one possible folder. Mention the selected or newly created Google Sheet separately after the location is resolved.
 
 ### 5. Create a simple document home
 
@@ -81,7 +78,7 @@ Do not ask the user to upload passwords, account credentials, or documents they 
 
 This step is for a new household setup only, after the user has connected Google Drive and chosen the Drive folder.
 
-Use the selected top-level folder as the household's private location and use its `Transactional Data` subfolder as the financial-data location. When the user supplied a Google Sheet, verify that it is a live Google Sheet inside `Transactional Data` and preserve it. When no Sheet was supplied, create one native Google Sheet named `Financial Data Warehouse` inside `Transactional Data`. Verify the sheet's parent folder and active status.
+Use the selected top-level folder as the household's private location and use its `Transactional Data` subfolder as the financial-data location. Search that subfolder for active native Google Sheets named exactly `Financial Data Warehouse`: preserve one match, create one when there is no match, and ask the user to choose when there are multiple matches. When the user explicitly supplied a different Google Sheet, verify that it is a live Sheet inside `Transactional Data` and preserve it. Verify the selected sheet's parent folder and active status.
 
 Do not retrieve, analyze, or import financial-account data in this desktop setup. Leave a newly created sheet ready for the separate web sync skill to initialize and populate.
 
@@ -127,13 +124,11 @@ Once the completed sync is confirmed, explain that connected account data covers
 
 Tell the user that they can upload only the records they are comfortable keeping in Drive, now or later; these documents are optional evidence for their private record and future Personal CFO work. Conversation with the agent is the standard way to provide context or answer questions; the agent writes any confirmed structured context under the hood. Do not ask the user to maintain a spreadsheet, ledger, or other structured file. Do not request credentials, passwords, or documents the user does not want stored.
 
-Ask which category they want to start with. Work through one category at a time: name the destination folder, repeat the relevant examples above, explicitly ask the user to obtain and upload the current documents that apply, and then record whether the category is populated, has no applicable records, or is deferred. For an unconnected account, explicitly ask the user to obtain and upload its most recent statement or export to `Transactional Data`. Then offer the next category. Preserve all existing files and keep the user in control of what is uploaded.
+Offer two paths: work through the categories together now, or let the user use the folder list as an upload checklist and return when ready. If working together, handle one category at a time: name the destination folder, repeat the relevant examples above, explicitly ask the user to obtain and upload the current documents that apply, and then record whether the category is populated, has no applicable records, or is deferred. For an unconnected account, explicitly ask the user to obtain and upload its most recent statement or export to `Transactional Data`. If the user chooses the checklist path, ask them to upload what they have and return when they want help with gaps; on return, inspect the folders rather than asking them to maintain a status log. Preserve all existing files and keep the user in control of what is uploaded.
 
 ## Ongoing use
 
-Explain the system in one short paragraph: the private record lives in the user's Drive; connected Finances data is synced into it from ChatGPT on the web; and the other Personal CFO tools automatically look for `Personal CFO Home` when a new chat does not already identify the folder. Recommend an initial Lifestyle Review before ongoing maintenance, because it establishes the household context used to interpret later data.
-
-After that review, offer an optional recurring data refresh—not a recurring review. Ask whether the user wants an automatic refresh and, only if they do, ask them to choose weekly, monthly, quarterly, yearly, or a custom cadence. Direct them to create a separate task in [ChatGPT Scheduled](https://chatgpt.com/scheduled) on the web using Financial Warehouse Sync. The saved task must authorize only a non-destructive sync into the existing warehouse resolved by `Personal CFO Home`; it must report connection or location problems instead of writing. It refreshes connected transaction data only. It does not update Household Context, classify transactions, gather documents, or perform a financial-plan review. Do not create a schedule from this desktop setup conversation without explicit user approval.
+Explain the system in one short paragraph: the private record lives in the user's Drive; connected Finances data is synced into it from ChatGPT on the web; and the other Personal CFO tools automatically look for `Personal CFO Home` when a new chat does not already identify the folder. Recommend an initial Lifestyle Review next. Mention that Lifestyle Review will offer optional ongoing data-refresh setup after it has established household context; do not introduce that decision during Setup.
 
 ## Safety boundaries
 

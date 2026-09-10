@@ -1,12 +1,17 @@
 {
   "name": "personal-cfo-lifestyle-review",
-  "version": "0.1.0",
+  "version": "0.1.0+codex.20260910012139",
   "description": "Leads a private, interactive review of household transaction patterns and their real-life context.",
   "author": {
     "name": "mcaspers"
   },
   "license": "MIT",
-  "keywords": ["personal finance", "household", "transactions", "lifestyle review"],
+  "keywords": [
+    "personal finance",
+    "household",
+    "transactions",
+    "lifestyle review"
+  ],
   "skills": "./skills/",
   "interface": {
     "displayName": "Personal CFO Lifestyle Review",
@@ -15,7 +20,9 @@
     "developerName": "mcaspers",
     "category": "Productivity",
     "capabilities": [],
-    "defaultPrompt": ["Review the lifestyle patterns in my Personal CFO transactions."]
+    "defaultPrompt": [
+      "Review the lifestyle patterns in my Personal CFO transactions."
+    ]
   },
   "apps": "./.app.json"
 }

@@ -1,12 +1,18 @@
 {
   "name": "personal-cfo-financial-plan",
-  "version": "0.1.0",
+  "version": "0.1.0+codex.20260910012139",
   "description": "Builds a private, objective-led household financial plan from established Personal CFO records.",
   "author": {
     "name": "mcaspers"
   },
   "license": "MIT",
-  "keywords": ["personal finance", "household", "financial plan", "goals", "budget"],
+  "keywords": [
+    "personal finance",
+    "household",
+    "financial plan",
+    "goals",
+    "budget"
+  ],
   "skills": "./skills/",
   "interface": {
     "displayName": "Personal CFO Financial Plan",
@@ -15,7 +21,9 @@
     "developerName": "mcaspers",
     "category": "Productivity",
     "capabilities": [],
-    "defaultPrompt": ["Create a financial plan from my Personal CFO household record."]
+    "defaultPrompt": [
+      "Create a financial plan from my Personal CFO household record."
+    ]
   },
   "apps": "./.app.json"
 }

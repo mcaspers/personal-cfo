@@ -11,9 +11,9 @@ This is planning support, not a professional advisory engagement. It does not ex
 
 ## Start with the working session
 
-Before examining account-level details, ask: “What financial objectives matter for this working session?” Ask whether this is a one-time decision, an annual plan, or an ongoing plan review. Work through each objective the user chooses and capture only what is useful: desired outcome, target timing, relative priority, constraints, and tradeoffs. Do not impose a generic goal list or assume a goal merely because data suggests one.
+Before examining account-level details, ask one opening question: “What would you like this plan to help you decide, and is this a one-time decision or something you want to revisit?” Work through each objective the user chooses and capture only what is useful: desired outcome, target timing, relative priority, constraints, and tradeoffs. Do not impose a generic goal list or assume a goal merely because data suggests one.
 
-Reflect the objectives back in plain language and ask the user to confirm their priority order. State that current evidence and household context will inform the discussion but will not decide the objectives for them.
+Reflect the objectives back in plain language. Ask the user to resolve a priority order only when objectives conflict or the tradeoff affects the analysis. State that current evidence and household context will inform the discussion but will not decide the objectives for them. Explain that, with their approval, confirmed decisions can be saved to `Personal CFO Financial Plan` at the end of the session.
 
 ## Resolve the household record
 
@@ -21,7 +21,7 @@ Resolve the household's top-level folder from a Drive link or ID provided in thi
 
 Inside the resolved folder, read the exact native Google Doc `Personal CFO Household Context` when exactly one exists. Treat its rules, patterns, and user-added notes as labeled user-provided context. Apply a rule only within its stated scope; keep any mismatch as an ambiguity. Do not use Household Context to overwrite synced data or replace evidence for balances, benefits, insurance, tax, legal, or investment facts.
 
-Use the exact `Transactional Data` subfolder for `Financial Data Warehouse` and sync exports. Before relying on the data, state the available transaction period, latest successful sync or export date, and material source or coverage gaps. Treat unavailable, stale, manual, and unsupported-provider values as gaps or explicitly dated evidence—not as zero, a closed account, or a complete picture. Ask the user to confirm the record's origin before using account-specific information in the plan.
+Use the exact `Transactional Data` subfolder for `Financial Data Warehouse` and sync exports. Before relying on the data, state the available transaction period, latest successful sync or export date, and material source or coverage gaps. Treat unavailable, stale, manual, and unsupported-provider values as gaps or explicitly dated evidence—not as zero, a closed account, or a complete picture. Proceed from the resolved household record and invite correction; ask for an action only when the record is ambiguous, unavailable, or materially incomplete.
 
 Review supporting documents in the existing top-level folders only when they are relevant to the chosen objectives. For example, use benefits, insurance, debt, property, retirement, or legal records only when they materially affect the session. Ask the user to upload an existing document if a needed fact is absent and they want it considered; never ask for credentials or require manual data entry into a structured file.
 
@@ -29,15 +29,11 @@ Review supporting documents in the existing top-level folders only when they are
 
 Build a concise, evidence-labeled snapshot that is relevant to the selected objectives: observed cash flow and recurring commitments, assets and liabilities when supported, savings or debt patterns, and material gaps. Keep verified facts, user-confirmed planning assumptions, and unknowns visibly distinct. Household Context explains patterns; the warehouse and supporting documents remain the evidence for amounts and dates.
 
-Ask the user to correct, defer, or leave unknown any material item before modeling it. Do not fill gaps with inferred balances, tax treatment, insurance coverage, estate intent, or investment assumptions.
+Show material gaps together and ask which, if any, must be resolved before modeling. The user may correct, defer, or leave them unknown. Do not fill gaps with inferred balances, tax treatment, insurance coverage, estate intent, or investment assumptions.
 
 ## Offer a budget only when useful
 
-After the current-position snapshot, explain whether a working budget would help the stated objectives. Ask: “Would you like to create a working budget as part of this plan?” The user may choose:
-
-- **No budget for this plan** — continue with objectives, observed cash flow, and scenarios; record that a budget was not created.
-- **Descriptive baseline** — summarize observed spending and known seasonal patterns without treating it as a target or limit.
-- **Working budget** — develop an objective-linked target budget with the user.
+After the current-position snapshot, explain whether a working budget would help the stated objectives. Ask: “Would you like to create a budget as part of this plan?” If not, continue with objectives, observed cash flow, and scenarios and record that no budget was created. If yes, ask whether the user wants a descriptive baseline or an objective-linked working budget.
 
 For a descriptive baseline or working budget, derive the initial categories and amounts from the confirmed warehouse window and Household Context. Discuss seasonal or irregular costs and user-provided adjustments in conversation. A working budget must state its period, included categories, expected irregular or seasonal costs, and any intentionally unallocated amount. Present it for the user's confirmation before saving it. Never silently convert observed spending into a budget or ask the user to type amounts into a spreadsheet.
 
@@ -55,7 +51,7 @@ Discuss tradeoffs and let the user select, defer, or reject each option. Frame p
 - `Personal CFO Household Context` is the reusable lifestyle and classification baseline.
 - `Personal CFO Financial Plan` is the current objective-led plan baseline.
 
-At the end of a planning session, summarize the session scope, prioritized objectives, evidence and data gaps, assumptions, budget choice, scenarios, tradeoffs, user decisions, and optional next steps. Ask for explicit confirmation before creating or updating the native Google Doc `Personal CFO Financial Plan` in the resolved top-level folder. If exactly one exists, update that document rather than creating another; if more than one exists, ask the user which is active. Verify the document's parent folder after writing.
+At the end of a planning session, summarize the session scope, prioritized objectives, evidence and data gaps, assumptions, budget choice, scenarios, tradeoffs, user decisions, and optional next steps. Give the user a concise preview and ask for confirmation to save only if they have not already approved saving the plan during this session. If exactly one native Google Doc `Personal CFO Financial Plan` exists, update it rather than creating another; if more than one exists, ask the user which is active. Verify the document's parent folder after writing.
 
 Use these headings in this order:
 
