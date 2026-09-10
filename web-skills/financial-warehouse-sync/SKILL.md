@@ -33,13 +33,13 @@ If Finances is not connected, has not finished syncing, or cannot return a read-
 
 ## Resolve the setup-created location
 
-At the start of a new run, a folder or spreadsheet link supplied in the current chat may be a destination candidate. Otherwise, look for the exact native Google Doc `Personal CFO Home` in the selected household folder and read its active-folder location. Treat that top-level folder as the only scope for uploaded files and supporting documents. Resolve its exact `Transactional Data` subfolder as the only scope for the warehouse. Do not search globally for similarly named folders.
+At the start of a new run, a user-supplied folder or spreadsheet link—including a native Google Sheet selected with an `@` mention—may be a destination candidate. Treat it as the selected spreadsheet link and resolve its exact ID rather than its title. Otherwise, look for the exact native Google Doc `Personal CFO Home` in the selected household folder and read its active-folder location. Treat that top-level folder as the only scope for uploaded files and supporting documents. Resolve its exact `Transactional Data` subfolder as the only scope for the warehouse. Do not search globally for similarly named folders.
 
 ### Destination lock
 
 Before the readiness report or any initialization, resolve one exact native Google Sheet and verify that it is active and has the resolved `Transactional Data` folder as its direct parent. Record its spreadsheet ID, URL, top-level folder ID, and `Transactional Data` folder ID as this run's **destination lock**. The readiness report and final write confirmation apply only to that lock.
 
-After a destination lock exists, a later file attachment, `@` mention, title match, or link must never switch the run's destination. If the user explicitly asks to use a different spreadsheet, stop the current run before mutation. Resolve that exact Sheet from scratch, verify its parent folder and active status, create a new destination lock, show the newly resolved location in plain language, and require a new final write confirmation. If it is outside the resolved `Transactional Data` folder, inaccessible, trashed, or ambiguous, do not initialize or write it.
+After a destination lock exists, a later spreadsheet link, `@` mention, or title match must never switch the run's destination. If the user explicitly asks to use a different spreadsheet link, stop the current run before mutation. Resolve that exact Sheet from scratch, verify its parent folder and active status, create a new destination lock, state that the selected spreadsheet link is the new target in plain language, and require a new final write confirmation. If it is outside the resolved `Transactional Data` folder, inaccessible, trashed, or ambiguous, do not initialize or write it.
 
 ## Canonical destination
 
@@ -49,7 +49,7 @@ Spreadsheet URL:
 `https://docs.google.com/spreadsheets/d//edit`
 
 Expected warehouse schema version: `v2`.
-Current sync skill version: `v2.7-portable`.
+Current sync skill version: `v2.8-portable`.
 
 Never create a replacement workbook during a normal sync.
 Never accept a trashed warehouse as canonical.
@@ -320,7 +320,7 @@ For a new warehouse:
 - `last_successful_sync` starts blank;
 - `last_full_reconcile` starts blank;
 - `schema_version` is `v2`;
-- `skill_version` is `v2.7-portable`.
+- `skill_version` is `v2.8-portable`.
 - `checkpoint` starts blank.
 
 ### Initialize Sync_Runs
@@ -359,7 +359,7 @@ Reason:
 - there is no prior snapshot state.
 
 The first full reconciliation uses the normal safety contract:
-- prove that every required source page and bounded history slice is row-readable before initializing or writing financial facts;
+- prove that every required source page and adaptive history slice is complete and row-readable before initializing or writing financial facts;
 - preserve manual memories as first-class inputs;
 - preserve stale-but-known connector snapshots;
 - compute every dry-run diff;
@@ -440,13 +440,28 @@ After destination-lock and source-completeness preflight pass, read these before
 
 ### Destination-lock validation
 
-Before each initialization or write phase, re-read the locked spreadsheet ID and verify that its URL, active status, and direct parent still match the lock. Use only that ID for every subsequent read and write in this run. A title match, Drive search result, attached resource, or another URL is never a substitute for the lock.
+Before each initialization or write phase, re-read the locked spreadsheet ID and verify that its URL, active status, and direct parent still match the lock. Use only that ID for every subsequent read and write in this run. A title match, Drive search result, `@`-selected link, or another URL is never a substitute for the lock.
 
 ### Source-completeness preflight
 
-Before schema initialization, `Sync_Runs` started records, dry-run diffs, or financial-data writes, enumerate every required source request: each bounded transaction-history slice/page, investment-transaction slice/page, recurring-stream response, and relevant accounts, balances, holdings, liabilities, and manual-memory responses. Retrieve enough metadata or payload to prove that every required response is row-readable in the current session.
+Before schema initialization, `Sync_Runs` started records, dry-run diffs, or financial-data writes, enumerate every required source request: each transaction-history range, investment-transaction range, recurring-stream response, and relevant accounts, balances, holdings, liabilities, and manual-memory responses. Retrieve enough metadata or payload to prove that every required response is complete and row-readable in the current session.
 
-A temporary CSV attachment, download reference, or other response that is unavailable for row-level parsing is a **source-completeness failure**. A connector that is already errored may remain a documented coverage gap when its last-known data is preserved; a missing page from an otherwise available dataset is not a coverage gap that permits a partial import.
+#### Adaptive transaction retrieval
+
+Finances may turn a large otherwise-valid transaction response into a temporary CSV or download that the current session cannot parse. Treat that as a request-sizing signal, not as source data and not as permission to import a subset.
+
+For `Transactions` and `Investment_Transactions`, retrieve the requested history with this adaptive algorithm before the preflight can pass:
+
+1. Determine the requested interval: all available history for an initial full reconciliation, or the normal overlap interval for a later delta. Request the interval with a conservative supported `limit` (start at 25 unless the connector exposes a smaller safe default).
+2. A response is accepted only when its rows are directly readable in this session **and** its metadata proves it is not truncated. If it reaches the requested limit, reports more results, or does not provide enough information to prove completeness, treat the interval as oversized even if its rows are readable.
+3. When an interval is oversized, returns a temporary CSV/download, or otherwise cannot be read row by row, split its calendar range into two smaller overlapping child ranges and retry both. Use a one-calendar-day overlap at the boundary; provider stable-key deduplication below removes the intentional overlap.
+4. Continue recursively until every child range is directly readable and complete. Never use a fixed row-count threshold as the decision rule.
+5. At the one-calendar-day minimum, use the supported single-account filter for each known eligible account before declaring that day unavailable. Do not infer a complete account list: obtain it from the readable account response and record which accounts were queried.
+6. If an account-filtered one-day request is still unreadable, truncated, or unavailable for row-level parsing—or a complete account list cannot be obtained—source-completeness preflight fails. State the dataset, interval, and safe account label or count; do not expose transactions, account numbers, or balances.
+
+Retain the directly readable rows from all successful child ranges only in run memory until the entire dataset is complete. Merge them by the provider stable key. An overlap duplicate is allowed only when its normalized records are materially identical; conflicting records with the same provider key are a source-integrity failure. Verify that the final interval tree covers the full requested period with no uncovered calendar day and that every leaf was accepted as complete.
+
+A temporary CSV attachment, download reference, or other response that remains unavailable after adaptive retrieval is a **source-completeness failure**. A connector that is already errored may remain a documented coverage gap when its last-known data is preserved; a missing page or failed adaptive leaf from an otherwise available dataset is not a coverage gap that permits a partial import.
 
 When source-completeness preflight fails:
 
@@ -455,9 +470,9 @@ When source-completeness preflight fails:
 - do not write or update any financial dataset, including `Sources` and `Accounts`;
 - leave every checkpoint unchanged;
 - append only one `failed` `Sync_Runs` audit row when the existing initialized warehouse supports that safe append; otherwise report the failure in chat; and
-- state the unavailable response and that zero financial rows were written.
+- state the unavailable response and that zero financial rows were written. For an empty first-run workbook, say that it **remained unchanged**; never say it was restored unless a verified, user-authorized restoration actually occurred.
 
-Proceed to normalization only after every required response is available for row-level parsing.
+Proceed to normalization only after every required response is available for row-level parsing and each transaction dataset's adaptive interval tree is complete.
 
 ### Schema validation
 
@@ -506,15 +521,15 @@ Use Finances to retrieve:
 
 ### Mandatory row-level ingestion
 
-For `Transactions`, `Investment_Transactions`, and `Recurring_Streams`, a CSV response is source data—not a completion report. Parse its header and every available data row, normalize it into the exact destination schema, compute the dry-run diff, and upsert the rows in the same run.
+For `Transactions`, `Investment_Transactions`, and `Recurring_Streams`, a directly readable CSV response is source data—not a completion report. Parse its header and every available data row, normalize it into the exact destination schema, compute the dry-run diff, and upsert the rows in the same run. A temporary or inaccessible CSV/download must instead follow adaptive transaction retrieval during preflight.
 
 For each CSV-derived dataset:
 
-1. Read the complete CSV payload and every bounded page before computing a diff or writing any row; retain provider IDs exactly as strings.
+1. Read the complete directly readable payload and every accepted adaptive range before computing a diff or writing any row; retain provider IDs exactly as strings.
 2. Parse quoted fields, embedded commas, blank values, dates, timestamps, booleans, and numeric values correctly. Do not use a line split that corrupts quoted CSV fields.
 3. Map each source field to the exact destination header. Preserve the unmodified source record in `raw_json` when that column exists.
 4. Reject only the malformed rows whose stable key is blank or duplicated, record their count and reason in `Sync_Runs`, and continue with valid rows when the source coverage remains usable.
-5. Hold the complete normalized source set in memory for the run, then compute its diff. Do not write a partial set merely because earlier pages were available. Re-read the written keys and verify the inserted/updated counts before advancing the checkpoint.
+5. Hold the complete normalized, stable-key-deduplicated source set in memory for the run, then compute its diff. Do not write a partial set merely because earlier pages or ranges were available. Re-read the written keys and verify the inserted/updated counts before advancing the checkpoint.
 
 It is never acceptable to report “retrieved as CSV but not imported” as a `partial` success for an otherwise readable dataset. If row-level parsing or writing cannot be completed, mark that dataset `failed`, leave its checkpoint unchanged, and state the concrete blocker. Do not claim the first full reconciliation succeeded while any of these three datasets is missing.
 
@@ -612,7 +627,7 @@ Mode: `upsert`
 Default query window:
 `last_successful_sync - 90 days` through now.
 
-Split into bounded date slices if connector row limits require it.
+Use adaptive transaction retrieval to split date ranges whenever a response is unreadable or cannot be proved complete; do not rely on a fixed row limit.
 
 Include transfers.
 
@@ -631,6 +646,8 @@ Stable key: `investment_transaction_id`
 Mode: `upsert`
 
 Use the same 90-day overlap concept.
+
+Use the same adaptive transaction retrieval rules as `Transactions`.
 
 Never remove previously captured investment activity solely because it is no longer returned.
 
@@ -899,7 +916,7 @@ For current-state tables:
 Version the warehouse schema and the sync implementation independently.
 
 - `warehouse_schema_version` / `Sync_State.schema_version` = `v2`
-- current `skill_version` = `v2.7-portable`
+- current `skill_version` = `v2.8-portable`
 
 A skill-version change does not imply a warehouse schema migration.
 A warehouse schema version changes only when the physical/control-table contract changes incompatibly or requires a real schema migration.
@@ -991,9 +1008,11 @@ Never:
 
 Before treating this skill version as ready, validate these observable outcomes:
 
-1. When a user mentions or attaches a second spreadsheet after readiness, the run retains the original destination lock. When the user explicitly requests that second sheet, the skill performs fresh parent verification, a fresh readiness report, and requires a new final confirmation before any write.
-2. When any required transaction or investment-transaction page is a session-unreadable temporary CSV attachment, the run records failure without writing financial rows or advancing checkpoints. On an empty first-run workbook, it leaves the workbook uninitialized.
-3. When every required page is row-readable, the complete normalized sets and all dry-run diffs are available before the first financial write.
+1. When a user selects or mentions a second spreadsheet link after readiness, the run retains the original destination lock. When the user explicitly requests that second link, the skill performs fresh parent verification, a fresh readiness report, and requires a new final confirmation before any write.
+2. When an initial transaction or investment-transaction range is a session-unreadable temporary CSV/download, the run splits the range and writes nothing until every resulting leaf is directly readable and complete.
+3. When an interval reaches one calendar day and every supported account-filtered request remains unreadable or cannot be proved complete, the run records failure without writing financial rows or advancing checkpoints. On an empty first-run workbook, it leaves the workbook uninitialized.
+4. Overlap records from adjacent ranges are deduplicated by stable key only when normalized content is identical; a conflicting duplicate fails preflight.
+5. When every required adaptive leaf is row-readable and complete, the complete normalized sets and all dry-run diffs are available before the first financial write.
 
 ## Completion report
 
