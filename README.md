@@ -44,7 +44,7 @@ Plugin availability depends on your plan, workspace settings, and which features
 4. In the **Git ref** field, enter:
 
    ```text
-   main
+   codex/personal-cfo-distribution
    ```
 
 5. Add the marketplace. A new **Personal CFO** marketplace will appear in your Plugins list.
@@ -65,26 +65,22 @@ Plugin availability depends on your plan, workspace settings, and which features
 
    - **Starting a new record:** continue to the next step.
    - **Joining an existing record:** ask the person who manages the household's budget and financial information to share that Google Drive folder with your Google account. Then paste its Google Drive link or folder ID when Personal CFO asks. That is all this setup path needs: it uses the established record rather than connecting your accounts or creating a duplicate.
-4. For a new household record, Setup connects Google Drive and asks where to store the record:
+4. For a new household record, Setup asks where to store the record:
 
    - **Create a Personal CFO Data folder for me**, or
    - **Use an existing Google Drive folder**.
-5. Setup reuses an existing `Personal CFO Data` folder if it finds one, so it does not create a second household record. It creates simple document folders and a small Google Drive document called `Personal CFO Home` in the one active top-level folder. The folders are for transactional data, cash and manual spending, benefits and insurance, debt and credit, estate and legal records, investments and retirement, and property and vehicles. `Financial Data Warehouse` lives inside `Transactional Data`. Do **not** delete `Personal CFO Home`: it is the grounding document every Personal CFO plugin uses to find this household's shared financial home. Upload copies of any documents you want available there now or later; they are not required for the first live-data sync.
+5. If Setup finds an existing `Personal CFO Data` folder, it lets you choose whether to use it or create a separate new one. It creates simple document folders and a small Google Drive document called `Personal CFO Home` in the one active top-level folder. The folders are for transactional data, cash and manual spending, benefits and insurance, debt and credit, estate and legal records, investments and retirement, and property and vehicles. `Financial Data Warehouse` lives inside `Transactional Data`. Do **not** delete `Personal CFO Home`: it is the grounding document every Personal CFO plugin uses to find this household's shared financial home. Upload copies of any documents you want available there now or later; they are not required for the first live-data sync.
 6. Before syncing, open **Plugins** in ChatGPT on the web and confirm that **Google Drive** says it is connected. This is separate from the desktop connection and is required for the web skill to find and update your spreadsheet.
 7. To import your live data, open [ChatGPT Finances on the web](https://chatgpt.com/finances), click **Connect Accounts**, and complete the secure connection screens for the accounts you want to include. Wait until Finances shows that account data has synced.
 8. In ChatGPT on the web, open **Skills** → **Create** → **Upload from your computer**. Download and upload [Financial Warehouse Sync](web-skills/financial-warehouse-sync.zip).
-9. Start a new web chat, run **Financial Warehouse Sync**, and say: `Sync my connected financial data into the Financial Data Warehouse in my Personal CFO folder.` Provide the folder or spreadsheet link if asked. The web skill first checks whether Finances is ready, then asks for your final confirmation before it writes anything.
-10. When Financial Warehouse Sync reports that it has completed, return to the same Personal CFO Setup conversation in the desktop app. Setup confirms the completed sync, then helps you gather the records that connected accounts cannot provide: statements for unconnected accounts, benefits and insurance information, debt records, estate documents, investment and retirement records, and current dated home and vehicle valuations. Upload only the documents you are comfortable keeping in your private Drive folders.
+9. Start a new web chat. In the message box, type `@financial warehouse sync`, then select **financial warehouse sync** from the suggestion that appears above the message box. After it is selected, send: `Sync my connected financial data into the Financial Data Warehouse in my Personal CFO folder.` Provide the folder or spreadsheet link if asked. The web skill first checks whether Finances is ready, then asks for your final confirmation before it writes anything.
+10. When Financial Warehouse Sync reports that it has completed, return to the same Personal CFO Setup conversation in the desktop app. Setup confirms the completed sync, then helps you gather the records that connected accounts cannot provide: statements for unconnected accounts, benefits and insurance information, debt records, estate documents, investment and retirement records, and current dated home and vehicle valuations. You can work through the folders together or use the folder list as an upload checklist and return when you want help with gaps. Upload only the documents you are comfortable keeping in your private Drive folders.
 
 That is it. Your private financial record is stored in your Google Drive. You can return later to refresh it or update your household context.
 
 ### Optional: understand the patterns behind your spending
 
-After a successful sync, install **Personal CFO Lifestyle Review** from the Personal CFO marketplace in the desktop app. Start a new task and say: `Review the lifestyle patterns in my Personal CFO transactions.` The skill walks through spending categories one at a time, treats cash withdrawals as funding rather than assumed expenses, surfaces ambiguous classifications, and asks how future matching transactions should be treated. It can also capture optional household explanations for seasonal variation—such as heating, cooling, holidays, travel, school, or camp—without requiring personal details. Conversation is the normal input: with your approval, the agent saves confirmed context in `Personal CFO Household Context` at the top of your private folder so later Personal CFO work can use it. You may add or revise household-contact notes there yourself if you prefer. Rerun Lifestyle Review whenever the context changes; it refreshes the same document for the other plugins.
-
-### Optional: turn your objectives into a financial plan
-
-After your first Lifestyle Review, install **Personal CFO Financial Plan** and start a new task: `Create a financial plan from my Personal CFO household record.` It begins by asking what financial objectives matter for this working session, then uses your synced data, uploaded records, and Household Context to examine the current position and a small set of relevant alternatives. It may offer to create a budget when that would help an objective, but a budget is optional. With your approval, it maintains one root-level `Personal CFO Financial Plan` document that records current objectives, evidence and gaps, assumptions, budget status, scenarios, decisions, and optional follow-up. This is a planning aid, not financial, investment, tax, legal, insurance, or other professional advice.
+After a successful sync, install **Personal CFO Lifestyle Review** from the Personal CFO marketplace in the desktop app. Start a new task and say: `Review the lifestyle patterns in my Personal CFO transactions.` The skill summarizes routine spending categories, then works through categories with ambiguities, material changes, seasonal patterns, or your selected interest. It treats cash withdrawals as funding rather than assumed expenses, surfaces ambiguous classifications, and asks how future matching transactions should be treated. It can also capture optional household explanations for seasonal variation—such as heating, cooling, holidays, travel, school, or camp—without requiring personal details. Conversation is the normal input: with your approval, the agent saves confirmed context in `Personal CFO Household Context` at the top of your private folder so later Personal CFO work can use it. You may add or revise household-contact notes there yourself if you prefer. Rerun Lifestyle Review whenever the context changes; it refreshes the same document for the other plugins.
 
 ### Optional: keep your data current automatically
 
@@ -105,7 +101,11 @@ After your first Lifestyle Review, you can have ChatGPT refresh the existing war
 
 5. Review the task's instructions and schedule, then save it. Check its first result before relying on it.
 
-Do not put spreadsheet IDs, folder IDs, balances, account numbers, or other sensitive details in a scheduled task's name or instructions. `Personal CFO Home` lets the task find the right household location without them. You can review, pause, edit, or delete the task from [Scheduled](https://chatgpt.com/scheduled). Rerun Lifestyle Review when your household context changes. Financial Plan will later use the refreshed data and Household Context as separate inputs. See OpenAI's [Scheduled tasks guide](https://help.openai.com/en/articles/10291617) for current availability, limits, and notification settings.
+Do not put spreadsheet IDs, folder IDs, balances, account numbers, or other sensitive details in a scheduled task's name or instructions. `Personal CFO Home` lets the task find the right household location without them. You can review, pause, edit, or delete the task from [Scheduled](https://chatgpt.com/scheduled). Rerun Lifestyle Review when your household context changes. Financial Plan uses refreshed data and Household Context as separate inputs. See OpenAI's [Scheduled tasks guide](https://help.openai.com/en/articles/10291617) for current availability, limits, and notification settings.
+
+### Optional: turn your objectives into a financial plan
+
+After your first Lifestyle Review, install **Personal CFO Financial Plan** and start a new task: `Create a financial plan from my Personal CFO household record.` It begins by asking what you want the plan to help you decide and whether it is a one-time decision or something you want to revisit. It then uses your synced data, uploaded records, and Household Context to examine the current position and a small set of relevant alternatives. It may offer to create a budget when that would help an objective, but a budget is optional. With your approval, it maintains one root-level `Personal CFO Financial Plan` document that records current objectives, evidence and gaps, assumptions, budget status, scenarios, decisions, and optional follow-up. This is a planning aid, not financial, investment, tax, legal, insurance, or other professional advice.
 
 ## If you cannot find “Add a marketplace”
 
@@ -122,7 +122,7 @@ Always review anything important before acting on it. Financial data can be inco
 
 ## For the publisher or technical tester only
 
-Before sharing the marketplace address, commit and push this repository to its default GitHub branch. The address in the user instructions reads the files from GitHub, not from your computer.
+Before sharing the marketplace address, commit and push this repository to the Git ref named in the user instructions. The address reads files from GitHub, not from your computer.
 
 This repository is a Codex marketplace. To test it from a local checkout:
 
@@ -139,4 +139,4 @@ The marketplace catalog is [`.agents/plugins/marketplace.json`](.agents/plugins/
 
 ## In-progress workflows
 
-Future workflow concepts, including Financial Plan, are kept in [`in-progress/`](in-progress/) while they are designed and tested. They are not listed in the marketplace and cannot be installed from it.
+Future workflow concepts are kept in [`in-progress/`](in-progress/) while they are designed and tested. They are not listed in the marketplace and cannot be installed from it.

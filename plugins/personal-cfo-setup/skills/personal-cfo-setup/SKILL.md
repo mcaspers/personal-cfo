@@ -99,7 +99,7 @@ For a new household setup, explain plainly that the private financial home is cr
 
 1. Open [ChatGPT on the web](https://chatgpt.com/finances) and connect Finances. Wait until the Finances page shows that account data has synced.
 2. Open **Skills**, select **Create**, then **Upload from your computer**, and upload the separately supplied `financial-warehouse-sync.zip` package.
-3. Start a new web chat, run **Financial Warehouse Sync**, and tell it: "Sync my connected financial data into the Financial Data Warehouse in my Personal CFO folder."
+3. Start a new web chat. In the message box, type `@financial warehouse sync`, then select **financial warehouse sync** from the suggestion that appears above the message box. After it is selected, send: "Sync my connected financial data into the Financial Data Warehouse in my Personal CFO folder."
 4. Give the web skill the selected Personal CFO folder or spreadsheet link if it asks. It automatically performs a read-only Finances readiness check, tells the user whether the connection is usable, and asks for a final confirmation before it writes live data into the spreadsheet.
 
 After giving this handoff, stop. Ask the user to return to this same Setup conversation after **Financial Warehouse Sync** reports that it has finished. Do not poll, create a recurring task, or begin the document-gathering conversation before the user returns.
