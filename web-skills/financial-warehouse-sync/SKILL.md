@@ -1,0 +1,1071 @@
+---
+name: financial-warehouse-sync
+description: Synchronize connected Finances data into the Financial Data Warehouse created or identified by Personal CFO Setup. Use only after setup has established the household's Drive location.
+---
+
+# Financial Warehouse Sync — Hardened v2
+
+## Web app scope
+
+This is an upload-ready ChatGPT web skill for the first and later live imports of a household's connected Finances data. Use it only in ChatGPT on the web, where both Finances and Google Drive are connected and usable. Do not run it in the desktop app.
+
+## Setup prerequisite
+
+Run **Personal CFO Setup** before using this skill. This skill expects one existing household foundation: an active top-level Personal CFO folder, a `Personal CFO Home` locator (or a folder link supplied in the current chat), and one native Google Sheet named `Financial Data Warehouse` inside its `Transactional Data` folder. Setup may also have created folders for benefits and insurance, debt, legal records, investments, property, and vehicles.
+
+`Personal CFO Home` is the household's durable grounding document. Preserve it in the top-level folder; do not delete, move, or overwrite it. This skill is a live-data importer, not a folder or workbook setup tool. Preserve the existing household structure. If the required location, locator, `Transactional Data` folder, or worksheet cannot be resolved, stop and direct the user back to Personal CFO Setup; do not create a new folder, locator, or replacement workbook.
+
+## Required readiness check and confirmation gate
+
+At the beginning of every run, automatically perform a **read-only** Finances readiness check. Confirm that Finances has completed an account sync and can return at least a connection status, account count, or available-data period. Also verify that Google Drive can access the intended top-level folder and its selected spreadsheet.
+
+Report the result in plain language without displaying account numbers, balances, or transactions. For example: "Finances is connected and data is available. I found your Financial Data Warehouse in your Personal CFO folder. Would you like me to sync it now?"
+
+Do not create, initialize, modify, or populate the workbook until the user gives an explicit affirmative answer in this web chat. A confirmation given earlier to the desktop setup plugin does not satisfy this gate.
+
+### Scheduled runs
+
+For a scheduled ChatGPT task, the task's saved instruction may serve as the explicit confirmation only when it clearly authorizes a recurring, non-destructive sync into the existing `Financial Data Warehouse` resolved through `Personal CFO Home` and `Transactional Data`. The household chooses its cadence in Scheduled; do not infer a cadence. Perform the same read-only Finances and Drive checks first. If either connection is unavailable, the location is ambiguous, the worksheet is missing, or the worksheet does not have the expected parent folder, do not write; report the condition for the user to resolve.
+
+Never infer recurring write permission from a generic reminder, a desktop-setup confirmation, or an earlier chat. A scheduled task must never create a replacement folder or workbook. Its outcome is limited to the warehouse sync and a plain-language status report; it does not update `Personal CFO Household Context`, classify transactions, or conduct a lifestyle or financial-plan review.
+
+If Finances is not connected, has not finished syncing, or cannot return a read-only availability check, stop and tell the user to finish or wait for the Finances sync. Do not write an empty financial import and do not describe the record as ready. If Drive cannot resolve exactly one intended folder and workbook, stop and ask the user for its link.
+
+## Resolve the setup-created location
+
+At the start of a new run, a user-supplied folder or spreadsheet link—including a native Google Sheet selected with an `@` mention—may be a destination candidate. Treat it as the selected spreadsheet link and resolve its exact ID rather than its title. Otherwise, look for the exact native Google Doc `Personal CFO Home` in the selected household folder and read its active-folder location. Treat that top-level folder as the only scope for uploaded files and supporting documents. Resolve its exact `Transactional Data` subfolder as the only scope for the warehouse. Do not search globally for similarly named folders.
+
+### Destination lock
+
+Before the readiness report or any initialization, resolve one exact native Google Sheet and verify that it is active and has the resolved `Transactional Data` folder as its direct parent. Record its spreadsheet ID, URL, top-level folder ID, and `Transactional Data` folder ID as this run's **destination lock**. The readiness report and final write confirmation apply only to that lock.
+
+After a destination lock exists, a later spreadsheet link, `@` mention, or title match must never switch the run's destination. If the user explicitly asks to use a different spreadsheet link, stop the current run before mutation. Resolve that exact Sheet from scratch, verify its parent folder and active status, create a new destination lock, state that the selected spreadsheet link is the new target in plain language, and require a new final write confirmation. If it is outside the resolved `Transactional Data` folder, inaccessible, trashed, or ambiguous, do not initialize or write it.
+
+## Canonical destination
+
+Configured canonical Spreadsheet ID (when already provisioned): ``
+
+Spreadsheet URL:
+`https://docs.google.com/spreadsheets/d//edit`
+
+Expected warehouse schema version: `v2`.
+Current sync skill version: `v2.8-portable`.
+
+Never create a replacement workbook during a normal sync.
+Never accept a trashed warehouse as canonical.
+Never initialize a replacement while a same-named warehouse in the target context is in Trash unless the user explicitly authorizes replacement. Once a canonical warehouse is resolved, update that warehouse in place.
+
+
+## Portable configuration
+
+This skill must not depend on any individual's spreadsheet IDs, folder IDs, institution names, account IDs, or manual-memory identifiers.
+
+Runtime configuration:
+- `warehouse_spreadsheet_id`: strongest identity when a canonical warehouse is already known;
+- `target_folder_id` or `target_folder_url`: required top-level household budget-and-financial-information folder selected during Setup; its `Transactional Data` subfolder is the warehouse location;
+- `warehouse_name`: defaults to `Financial Data Warehouse`.
+
+If no spreadsheet ID is configured, use setup-location discovery.
+
+Do not require the user to edit this skill merely to supply their own Drive IDs when the host environment supports runtime or persisted configuration.
+
+Institution names may appear in source data, but no institution may be embedded here as a required verification sentinel.
+
+## Setup-created workbook mode
+
+The skill supports first-run schema initialization for the empty canonical worksheet created by Personal CFO Setup. It does not create a new worksheet.
+
+### Discovery after setup
+
+Before any sync, resolve the target top-level folder **first**, then its exact `Transactional Data` subfolder, then resolve the canonical warehouse **only within that subfolder**.
+
+Target warehouse name:
+`Financial Data Warehouse`
+
+Discovery rules:
+
+1. Resolve exactly one active top-level target folder and exactly one active `Transactional Data` subfolder.
+   - Use the `target_folder_id` or `target_folder_url` supplied by Setup.
+   - Exclude trashed folders.
+   - If either is absent, inaccessible, or ambiguous, **fail closed** and ask Setup to identify or repair the household location.
+2. If Setup supplies `warehouse_spreadsheet_id` or a Google Sheet URL, fetch that exact Sheet and verify that it is native Google Sheets, not trashed, and inside the resolved `Transactional Data` folder. If valid, use it as the canonical warehouse and skip name-based discovery. If it is a new, uninitialized sheet created by Personal CFO Setup, initialize that exact sheet in place using the setup-created workbook schema contract before importing facts. If it fails any check, stop and explain the mismatch; do not silently choose or create another workbook.
+3. If Setup did not supply a Sheet, search only inside the resolved `Transactional Data` folder for a native Google Sheet named exactly `Financial Data Warehouse`.
+   - Restrict by the `Transactional Data` parent folder ID.
+   - Restrict to native Google Sheets.
+   - Require `trashed = false`.
+   - Do **not** accept a global Drive search result that merely has the right title.
+4. If exactly one active matching warehouse exists inside `Transactional Data`, use it.
+5. If multiple active matching warehouses exist inside `Transactional Data`, **fail closed** and report an ambiguity.
+6. Separately check for same-named trashed warehouse candidates associated with `Transactional Data`.
+   - If an otherwise matching warehouse exists in Trash, **fail closed**.
+   - Report that the existing warehouse must be restored or explicitly replaced.
+   - Do not treat a trashed file as canonical.
+   - Do not silently create a replacement while a same-named trashed warehouse exists.
+7. If warehouse lookup fails because of permissions, connector errors, unavailable Drive access, an unresolved folder, or no matching worksheet, stop and direct the user back to Personal CFO Setup. **Do not create a replacement.**
+
+Never create a second warehouse merely because a lookup timed out, returned an access error, or found a matching file outside the resolved `Transactional Data` folder.
+
+### Folder handling
+
+Use the `Transactional Data` folder selected through the top-level location from Setup. Do not search for or create another folder by name. If either location is inaccessible or ambiguous, stop before initializing or syncing the workbook.
+
+### Initializing the setup-created warehouse
+
+When first-run initialization is required, use the valid empty Sheet supplied or resolved from Personal CFO Setup. Never create a native Google Sheet from this skill.
+
+For the setup-created empty Sheet, preserve its identity and `Transactional Data` parent folder:
+
+1. Re-read its Drive metadata and verify:
+   - its parent folder is the resolved `Transactional Data` folder;
+   - it is not trashed;
+   - its MIME type is native Google Sheets.
+2. If placement verification fails, stop. Do not initialize financial tables in a file whose destination is unresolved.
+3. Record its spreadsheet ID and URL as the canonical warehouse for the run.
+4. Create the complete v2 schema before writing financial facts.
+
+Required tabs:
+
+- `Transactions`
+- `Metadata`
+- `Sources`
+- `Accounts`
+- `Balance_Snapshots`
+- `Asset_Snapshots`
+- `Investment_Holdings`
+- `Investment_Transactions`
+- `Liabilities`
+- `Recurring_Streams`
+- `Data_Dictionary`
+- `Sync_State`
+- `Sync_Runs`
+
+Do not create a simplified seven-tab demonstration workbook.
+
+### Setup-created workbook schema contract
+
+For a new setup-created workbook, create the following exact v2 headers in the stated order. Do not substitute convenient aliases such as `currency`, `provider`, `net_balance`, or `raw_json` omissions. This is the canonical schema used by the established Personal CFO warehouse and keeps new households compatible with every downstream Personal CFO skill.
+
+```text
+Transactions: transaction_id, item_id, account_id, account_name, date, authorized_date, name, merchant_name, amount, currency_code, pending, category_primary, category_detailed, transaction_type, payment_channel, location_json, source_as_of, observed_at, raw_json
+Metadata: key, value
+Sources: source_key, item_id, source_type, provider_name, institution_name, status, last_successful_update, last_error, coverage_state, coverage_availability, coverage_freshness, source_as_of, observed_at, provenance_json
+Accounts: account_id, item_id, source_key, institution_name, account_name, official_name, account_type, account_subtype, currency_code, mask, current_balance, available_balance, credit_limit, status, source_as_of, observed_at, provenance_json
+Balance_Snapshots: account_id, balance_as_of, source_type, current_balance, available_balance, credit_limit, currency_code, status, source_as_of, observed_at
+Asset_Snapshots: memory_id, asset_name, asset_type, value, currency_code, liability_balance, notes, snapshot_as_of, source_as_of, observed_at, raw_json
+Investment_Holdings: account_id, security_id, snapshot_as_of, security_name, ticker, type, quantity, price, value, cost_basis, currency_code, source_as_of, observed_at, raw_json
+Investment_Transactions: investment_transaction_id, account_id, security_id, date, name, type, subtype, quantity, amount, price, fees, currency_code, source_as_of, observed_at, raw_json
+Liabilities: account_id, snapshot_as_of, liability_type, current_balance, statement_balance, minimum_payment, payment_due_date, apr, interest_rate, escrow_balance, loan_term, origination_date, currency_code, source_as_of, observed_at, raw_json, liability_record_type, liability_coverage_status, linked_asset_id, linked_asset_memory_id
+Recurring_Streams: stream_id, account_name, item_id, account_id, flow_type, description, merchant_name, frequency, last_amount, average_amount, predicted_next_date, category_primary, category_detailed, is_active, source_as_of, observed_at, lifecycle_status, raw_json, normalized_average_amount, normalized_last_amount, cash_flow_normalization_status
+Data_Dictionary: sheet, column, description, key_role, mode, notes
+Sync_State: dataset, mode, stable_key, overlap_days, last_successful_sync, last_full_reconcile, schema_version, skill_version, migration_policy, checkpoint
+Sync_Runs: run_id, started_at, completed_at, mode, status, dataset, rows_read, rows_inserted, rows_updated, rows_unchanged, rows_marked_stale_or_inactive, error_summary, checkpoint, preflight_status, source_key_duplicates, destination_key_duplicates, skill_version, lock_expires_at, diff_hash, warehouse_schema_version, material_changed_fields
+```
+
+Populate `Data_Dictionary` during initialization with one row for every managed physical column. It must not be left as a header-only tab.
+
+Stable keys:
+- `Transactions`: `transaction_id`
+- `Sources`: `source_key`
+- `Accounts`: `account_id`
+- `Investment_Transactions`: `investment_transaction_id`
+- `Recurring_Streams`: `stream_id`
+
+Manual accounts must still populate canonical `account_id` with their persistent manual identifier.
+
+#### Recurring_Streams
+Must include:
+- `stream_id`
+- `account_name`
+- `item_id`
+- `account_id`
+- recurring fields
+- `normalized_average_amount`
+- `normalized_last_amount`
+- `cash_flow_normalization_status`
+- `source_as_of`
+- `observed_at`
+- `lifecycle_status`
+
+Stable key: `stream_id`.
+
+A freshly initialized setup-created warehouse has no legacy recurring migration state.
+
+#
+#### Normalized recurring cash-flow semantics
+
+Preserve provider-native recurring amounts exactly in raw fields.
+
+Also expose:
+- `normalized_average_amount`
+- `normalized_last_amount`
+- `cash_flow_normalization_status`
+
+Canonical sign convention:
+- positive = cash inflow to the user;
+- negative = cash outflow from the user.
+
+Determine normalization from `flow_type` / source direction semantics, not by blindly multiplying all provider amounts by `-1`.
+
+If direction is ambiguous:
+- leave normalized amount blank/null;
+- set normalization status to `ambiguous`;
+- do not infer direction from merchant name alone.
+
+Suggested statuses:
+- `normalized`
+- `already_canonical`
+- `ambiguous`
+- `not_applicable`
+
+Normalized fields are derived warehouse semantics and must never overwrite raw provider amounts.
+
+### Balance_Snapshots
+Must include:
+- `account_id`
+- `balance_as_of`
+- `source_type`
+- `source_as_of`
+- `observed_at`
+
+Stable snapshot key:
+`account_id | balance_as_of | source_type`.
+
+#### Investment_Holdings
+Must include:
+- `account_id`
+- `security_id`
+- `snapshot_as_of`
+- `observed_at`
+
+Stable snapshot key:
+`account_id | security_id | snapshot_as_of`.
+
+#### Investment_Transactions
+Must include `investment_transaction_id`.
+
+#
+### Liability completeness reconciliation
+
+Treat `Accounts` as the completeness control for debts and `Liabilities` as the detailed liability register.
+
+For every active debt-bearing `Accounts.account_id` (mortgage, loan, line of credit, credit card, or other amount owed), require either:
+1. a current `Liabilities` row with the same `account_id`; or
+2. a current fallback `Liabilities` row with `liability_coverage_status=balance_only`.
+
+Never reconcile by account name, institution, mask, or display label. Join by `account_id`.
+
+If the source exposes a current authoritative account balance but no structured liability details:
+- create or update a liability snapshot using that balance;
+- set `liability_record_type=account_balance_fallback`;
+- set `liability_coverage_status=balance_only`;
+- preserve provenance;
+- leave APR, due date, minimum payment, statement balance, and other unavailable terms blank/null;
+- never estimate missing terms.
+
+If structured liability details become available later, preserve prior balance-only evidence and add/update the structured snapshot under normal snapshot rules.
+
+Compute `debt_accounts_without_liability_rows` every run.
+Steady-state expectation is 0.
+
+If nonzero:
+- report each missing `account_id`;
+- do not claim debt completeness;
+- mark the liability dataset/run partial when safe fallback creation is impossible because required source balance data is unavailable.
+
+### Liabilities
+Must include:
+- `account_id`
+- `snapshot_as_of`
+- `source_as_of`
+- `observed_at`
+
+Stable snapshot key:
+`account_id | snapshot_as_of`.
+
+#### Asset_Snapshots
+Must include:
+- `memory_id`
+- `snapshot_as_of`
+- `source_as_of`
+- `observed_at`
+
+Stable snapshot key:
+`memory_id | snapshot_as_of`.
+
+### Initialize Metadata
+
+Set at minimum:
+
+- `Dataset` = `Financial data warehouse`
+- `Warehouse schema version` = `v2`
+- `Setup initialization status` = `initialized`
+- `Setup initialization created_at` = current ISO 8601 timestamp
+- `Purpose` = portable structured financial warehouse for Google Drive / GPT workflows
+
+### Initialize Sync_State
+
+Create one row for each managed dataset with the current physical key and mode:
+
+- `Transactions` — `upsert` — `transaction_id` — overlap 90
+- `Investment_Transactions` — `upsert` — `investment_transaction_id` — overlap 90
+- `Recurring_Streams` — `upsert_current_state` — `stream_id`
+- `Balance_Snapshots` — `append_snapshot` — `account_id|balance_as_of|source_type`
+- `Investment_Holdings` — `append_snapshot` — `account_id|security_id|snapshot_as_of`
+- `Liabilities` — `append_snapshot` — `account_id|snapshot_as_of`
+- `Accounts` — `upsert` — `account_id`
+- `Sources` — `upsert` — `source_key`
+- `Asset_Snapshots` — `append_snapshot` — `memory_id|snapshot_as_of`
+
+For a new warehouse:
+- `last_successful_sync` starts blank;
+- `last_full_reconcile` starts blank;
+- `schema_version` is `v2`;
+- `skill_version` is `v2.8-portable`.
+- `checkpoint` starts blank.
+
+### Initialize Sync_Runs
+
+Create the full v2 audit schema including:
+
+- `run_id`
+- `started_at`
+- `completed_at`
+- `mode`
+- `status`
+- `dataset`
+- `rows_read`
+- `rows_inserted`
+- `rows_updated`
+- `rows_unchanged`
+- `rows_marked_stale_or_inactive`
+- `error_summary`
+- `checkpoint`
+- `preflight_status`
+- `source_key_duplicates`
+- `destination_key_duplicates`
+- `skill_version`
+- `lock_expires_at`
+- `diff_hash`
+- `warehouse_schema_version`
+- `material_changed_fields`
+
+### First-run behavior
+
+A newly initialized setup-created warehouse must perform a **full reconciliation**, never a delta reconciliation.
+
+Reason:
+- there is no trusted checkpoint;
+- there is no existing event history;
+- there is no prior snapshot state.
+
+The first full reconciliation uses the normal safety contract:
+- prove that every required source page and adaptive history slice is complete and row-readable before initializing or writing financial facts;
+- preserve manual memories as first-class inputs;
+- preserve stale-but-known connector snapshots;
+- compute every dry-run diff;
+- write in canonical order;
+- verify all stable keys;
+- only then advance checkpoints.
+
+### First-run initialization rollback behavior
+
+If warehouse creation succeeds but schema initialization fails:
+
+- do not treat the file as a valid canonical warehouse;
+- mark `Metadata` setup initialization status as `failed` if possible;
+- report the partially initialized spreadsheet;
+- do not write financial facts into an incomplete schema.
+
+If source-completeness preflight fails for a first run, do not initialize the workbook or write financial facts. Report the failure in chat; when an already initialized warehouse has a usable `Sync_Runs` tab, append only its failed audit row. Do not create another warehouse on retry.
+
+If a later failure occurs after schema initialization and after source-completeness preflight, preserve prior successful history and checkpoints, record the failure in `Sync_Runs`, and do not create another warehouse on retry. Do not treat a workbook containing a failed first-run partial import as ready: require the user to restore it to its pre-run state or choose an explicit recovery workflow before attempting a clean first sync. Never clear or repair such rows automatically.
+
+### Post-initialization idempotency
+
+After the initial full reconciliation succeeds:
+
+1. immediately run or recommend the normal delta acceptance test;
+2. expect a near-no-op when the source has not materially changed;
+3. future runs auto-detect and reuse the same warehouse rather than creating a new one.
+
+### Destination verification
+
+Every successful run must be able to report:
+- canonical spreadsheet ID;
+- canonical spreadsheet URL;
+- resolved top-level folder ID or URL and `Transactional Data` folder ID or URL;
+- confirmation that the warehouse is active (`trashed=false`);
+- confirmation that the warehouse parent matches the resolved `Transactional Data` folder.
+
+If these conditions cannot be verified, the run must not report successful warehouse resolution.
+
+### Canonical identity after initialization
+
+Once a warehouse is created successfully, its spreadsheet ID is the strongest canonical identity.
+
+Name-based discovery is only for initial resolution.
+
+If the caller/runtime can persist configuration, store:
+- spreadsheet ID;
+- top-level target folder ID and `Transactional Data` folder ID;
+- schema version.
+
+On later runs, prefer the stored spreadsheet ID and verify it still resides in the intended folder.
+
+
+## Safety model
+
+The default operation is a **delta reconciliation**, not an append dump and not a destructive overwrite.
+
+Every run has four phases:
+
+1. **Preflight**
+2. **Read + normalize**
+3. **Dry-run diff**
+4. **Write + verify + checkpoint**
+
+A dataset MUST NOT be written if its preflight fails. Before the first financial-data mutation in any run, every required source dataset and page must pass source-completeness preflight.
+
+## Phase 1 — Preflight
+
+Run preflight in this order: destination-lock validation, source-completeness preflight, then schema and existing-key validation. An empty first-run workbook therefore reaches schema initialization only after source-completeness preflight succeeds.
+
+After destination-lock and source-completeness preflight pass, read these before fetching/writing facts:
+
+- spreadsheet metadata and sheet names;
+- `Metadata`;
+- `Sync_State`;
+- recent `Sync_Runs`;
+- headers of every target dataset.
+
+### Destination-lock validation
+
+Before each initialization or write phase, re-read the locked spreadsheet ID and verify that its URL, active status, and direct parent still match the lock. Use only that ID for every subsequent read and write in this run. A title match, Drive search result, `@`-selected link, or another URL is never a substitute for the lock.
+
+### Source-completeness preflight
+
+Before schema initialization, `Sync_Runs` started records, dry-run diffs, or financial-data writes, enumerate every required source request: each transaction-history range, investment-transaction range, recurring-stream response, and relevant accounts, balances, holdings, liabilities, and manual-memory responses. Retrieve enough metadata or payload to prove that every required response is complete and row-readable in the current session.
+
+#### Adaptive transaction retrieval
+
+Finances may turn a large otherwise-valid transaction response into a temporary CSV or download that the current session cannot parse. Treat that as a request-sizing signal, not as source data and not as permission to import a subset.
+
+For `Transactions` and `Investment_Transactions`, retrieve the requested history with this adaptive algorithm before the preflight can pass:
+
+1. Determine the requested interval: all available history for an initial full reconciliation, or the normal overlap interval for a later delta. Request the interval with a conservative supported `limit` (start at 25 unless the connector exposes a smaller safe default).
+2. A response is accepted only when its rows are directly readable in this session **and** its metadata proves it is not truncated. If it reaches the requested limit, reports more results, or does not provide enough information to prove completeness, treat the interval as oversized even if its rows are readable.
+3. When an interval is oversized, returns a temporary CSV/download, or otherwise cannot be read row by row, split its calendar range into two smaller overlapping child ranges and retry both. Use a one-calendar-day overlap at the boundary; provider stable-key deduplication below removes the intentional overlap.
+4. Continue recursively until every child range is directly readable and complete. Never use a fixed row-count threshold as the decision rule.
+5. At the one-calendar-day minimum, use the supported single-account filter for each known eligible account before declaring that day unavailable. Do not infer a complete account list: obtain it from the readable account response and record which accounts were queried.
+6. If an account-filtered one-day request is still unreadable, truncated, or unavailable for row-level parsing—or a complete account list cannot be obtained—source-completeness preflight fails. State the dataset, interval, and safe account label or count; do not expose transactions, account numbers, or balances.
+
+Retain the directly readable rows from all successful child ranges only in run memory until the entire dataset is complete. Merge them by the provider stable key. An overlap duplicate is allowed only when its normalized records are materially identical; conflicting records with the same provider key are a source-integrity failure. Verify that the final interval tree covers the full requested period with no uncovered calendar day and that every leaf was accepted as complete.
+
+A temporary CSV attachment, download reference, or other response that remains unavailable after adaptive retrieval is a **source-completeness failure**. A connector that is already errored may remain a documented coverage gap when its last-known data is preserved; a missing page or failed adaptive leaf from an otherwise available dataset is not a coverage gap that permits a partial import.
+
+When source-completeness preflight fails:
+
+- do not initialize an empty first-run workbook;
+- do not append a `started` record;
+- do not write or update any financial dataset, including `Sources` and `Accounts`;
+- leave every checkpoint unchanged;
+- append only one `failed` `Sync_Runs` audit row when the existing initialized warehouse supports that safe append; otherwise report the failure in chat; and
+- state the unavailable response and that zero financial rows were written. For an empty first-run workbook, say that it **remained unchanged**; never say it was restored unless a verified, user-authorized restoration actually occurred.
+
+Proceed to normalization only after every required response is available for row-level parsing and each transaction dataset's adaptive interval tree is complete.
+
+### Schema validation
+
+For every dataset in `Sync_State`:
+
+1. Read `stable_key`.
+2. Split composite keys on `|`.
+3. Verify every named key column physically exists in the target sheet.
+4. Verify required provenance columns for snapshot datasets exist.
+5. Verify the warehouse schema version is compatible.
+
+If a declared key column is absent, **fail closed** for that dataset.
+
+Never invent a composite identity when a provider/source identity is declared.
+
+### Existing-key validation
+
+For normal keyed rows:
+
+- no blank stable key is allowed;
+- no duplicate stable key is allowed.
+
+Exception: the explicitly documented one-time `Recurring_Streams` legacy migration described below.
+
+### Lightweight run lock
+
+Before writing, inspect `Sync_Runs` for `status=started` with an unexpired `lock_expires_at`.
+
+If an active lock exists, do not start a competing write.
+
+If an old lock is clearly expired, mark that prior run failed/abandoned before proceeding.
+
+Only after destination-lock and source-completeness preflight pass, append a `started` record for each dataset before its first mutation.
+
+## Phase 2 — Read and normalize source data
+
+Use Finances to retrieve:
+
+- linked accounts and connector health;
+- financial memories/manual assets;
+- transactions;
+- recurring transactions;
+- investment holdings;
+- investment transactions;
+- liabilities.
+
+### Mandatory row-level ingestion
+
+For `Transactions`, `Investment_Transactions`, and `Recurring_Streams`, a directly readable CSV response is source data—not a completion report. Parse its header and every available data row, normalize it into the exact destination schema, compute the dry-run diff, and upsert the rows in the same run. A temporary or inaccessible CSV/download must instead follow adaptive transaction retrieval during preflight.
+
+For each CSV-derived dataset:
+
+1. Read the complete directly readable payload and every accepted adaptive range before computing a diff or writing any row; retain provider IDs exactly as strings.
+2. Parse quoted fields, embedded commas, blank values, dates, timestamps, booleans, and numeric values correctly. Do not use a line split that corrupts quoted CSV fields.
+3. Map each source field to the exact destination header. Preserve the unmodified source record in `raw_json` when that column exists.
+4. Reject only the malformed rows whose stable key is blank or duplicated, record their count and reason in `Sync_Runs`, and continue with valid rows when the source coverage remains usable.
+5. Hold the complete normalized, stable-key-deduplicated source set in memory for the run, then compute its diff. Do not write a partial set merely because earlier pages or ranges were available. Re-read the written keys and verify the inserted/updated counts before advancing the checkpoint.
+
+It is never acceptable to report “retrieved as CSV but not imported” as a `partial` success for an otherwise readable dataset. If row-level parsing or writing cannot be completed, mark that dataset `failed`, leave its checkpoint unchanged, and state the concrete blocker. Do not claim the first full reconciliation succeeded while any of these three datasets is missing.
+
+Preserve stale-but-known provider state.
+
+A connector returning an error or no current detail does NOT mean:
+- balance = 0;
+- holding deleted;
+- account deleted;
+- old history should be removed.
+
+### Normalization rules
+
+Before comparing:
+
+- preserve provider IDs exactly as strings;
+- normalize blank/null consistently;
+- use ISO 8601 timestamps;
+- normalize dates to a canonical `YYYY-MM-DD` representation where only a date is known;
+- keep timestamp precision when a real timestamp exists;
+- compare money at source-currency precision;
+- do not replace a higher-precision timestamp with a lower-precision date;
+- serialize nested JSON deterministically before comparison;
+- preserve raw/provider values separately when normalized equivalents also exist.
+
+### Destination cell types
+
+Write every destination cell with its semantic Google Sheets type. Keep provider IDs, labels, dates, timestamps, JSON, categories, and status fields as strings. Preserve identifiers as strings even when they contain only digits.
+
+Write valid financial measures as numeric cells, not numeric-looking text. This includes `Transactions.amount`; all quantity, amount, price, fee, value, cost-basis, balance, limit, payment, rate, escrow, and term fields in the other managed datasets; and the recurring-stream amount fields. Parse a source value such as `"8.45"` to the number `8.45` during normalization. Leave unavailable numeric values blank/null.
+
+Write `Transactions.pending`, `Recurring_Streams.is_active`, and other true/false fields as boolean cells.
+
+When the Sheets write interface exposes typed values, use `numberValue` for a number and `boolValue` for a boolean. Use `stringValue` only for a semantically textual field. A leading apostrophe is text-entry syntax, so numeric writes must pass the parsed number directly rather than a quoted or apostrophe-prefixed representation.
+
+After each dataset write, re-read representative inserted and updated cells with their effective values. A numeric destination column must return `numberValue`, and a boolean destination column must return `boolValue`. If a typed value is returned as `stringValue`, mark that dataset failed, leave its checkpoint unchanged, and report the cell-type mismatch.
+
+### Material-change comparison exclusions
+
+For event and current-state tables, exclude sync-generated/warehouse metadata from equality checks.
+
+At minimum exclude fields whose only purpose is ingestion/audit metadata, including:
+- `observed_at`
+- `snapshot_exported_at`
+- `run_id`
+- ingestion timestamps
+- checkpoint fields
+- diff hashes
+- lock timestamps
+- audit-only status timestamps generated by this sync
+
+Do not count a row as updated merely because one of these fields changed.
+
+When a row is classified as updated, record or report the names of the material fields that actually changed.
+This is especially important for `Investment_Transactions` and `Transactions`.
+
+## Phase 3 — Dry-run diff
+
+No dataset is written until every required source response has passed source-completeness preflight and every dataset's diff is computed from its complete normalized source set.
+
+For every dataset compute:
+
+- `rows_read`
+- `rows_inserted`
+- `rows_updated`
+- `rows_unchanged`
+- `rows_marked_stale_or_inactive`
+- `source_key_duplicates`
+- `destination_key_duplicates`
+
+Also compute a deterministic `diff_hash` from the normalized planned mutations.
+
+### Abort conditions
+
+Abort that dataset before writing if:
+
+- required key column is missing;
+- unexpected blank keys exist;
+- duplicate source keys exist;
+- duplicate destination keys exist;
+- a legacy-key migration is ambiguous;
+- a current-state operation would unexpectedly remove a material percentage of rows without an explicit source/coverage explanation;
+- source coverage indicates history is incomplete and the proposed plan would delete/retire history.
+
+Record the failure in `Sync_Runs`.
+
+## Dataset contracts
+
+### Transactions
+
+Stable key: `transaction_id`
+
+Mode: `upsert`
+
+Default query window:
+`last_successful_sync - 90 days` through now.
+
+Use adaptive transaction retrieval to split date ranges whenever a response is unreadable or cannot be proved complete; do not rely on a fixed row limit.
+
+Include transfers.
+
+Behavior:
+- new key -> insert;
+- existing key with normalized field changes -> update;
+- unchanged -> no write;
+- missing from current delta response -> no deletion.
+
+A retry must be idempotent.
+
+### Investment_Transactions
+
+Stable key: `investment_transaction_id`
+
+Mode: `upsert`
+
+Use the same 90-day overlap concept.
+
+Use the same adaptive transaction retrieval rules as `Transactions`.
+
+Never remove previously captured investment activity solely because it is no longer returned.
+
+### Recurring_Streams
+
+Stable key: `stream_id`
+
+Mode: `upsert_current_state`
+
+**Never clear the tab before writing.**
+
+Behavior:
+- retrieve the complete current recurring stream set;
+- upsert by `stream_id`;
+- update mutable fields such as prediction, amounts, active state, account name, item ID, category, and description;
+- if a previously known stream is absent, mark it `not_returned` or inactive only when the complete-source coverage is trustworthy;
+- do not delete the historical row.
+
+#### One-time legacy migration
+
+The v1 warehouse contains legacy recurring rows created before `stream_id` was stored.
+
+Those rows are marked `lifecycle_status=legacy_unkeyed`.
+
+A sync may backfill them exactly once only when ALL of the following hold:
+
+1. `stream_id` column exists.
+2. Every legacy destination row maps to exactly one incoming source stream.
+3. Every incoming candidate maps to at most one legacy destination row.
+4. The deterministic migration tuple is unique on both sides.
+5. No ambiguous pair exists.
+
+Recommended migration tuple for the current warehouse:
+
+`account_id | flow_type | description | merchant_name | frequency | normalized_last_amount`
+
+This tuple is for migration only, never the long-term key.
+
+If one-to-one uniqueness fails, abort `Recurring_Streams` without mutation.
+
+After successful migration:
+- populate `stream_id`;
+- set `lifecycle_status=active` or the source-derived current lifecycle;
+- fill missing `account_name` and `item_id`;
+- record migration counts in `Sync_Runs`;
+- thereafter require nonblank unique `stream_id` on every populated row.
+
+Once no populated `Recurring_Streams` row has `lifecycle_status=legacy_unkeyed`, normal runs MUST NOT execute fuzzy/composite migration logic.
+
+If `Sync_State.migration_policy = migration_complete`, legacy migration logic is disabled entirely for normal runs:
+- require nonblank unique `stream_id`;
+- do not evaluate migration tuples;
+- do not attempt fuzzy/composite matching;
+- fail closed if an unexpected unkeyed populated row appears.
+
+Treat the legacy migration procedure as recovery-only documentation from that point forward.
+
+### Sources
+
+Stable key: `source_key`
+
+Mode: `upsert`
+
+`source_key` is the canonical physical identity for both connected and manual sources.
+Do not substitute `item_id_or_source_name` or any other pseudo-key at runtime.
+
+Update connector health in place.
+
+Do not propagate connector failure into historical snapshot deletion.
+
+### Accounts
+
+Stable key: `account_id`
+
+Mode: `upsert`
+
+All warehouse account rows, including manual/unsupported-provider accounts, must expose a canonical physical `account_id`.
+For manual rows, that field may contain the persistent manual identifier.
+Do not use `account_id_or_persistent_account_id` as a declared key because it is a resolution rule, not a column.
+
+Provider status/metadata are current-state fields.
+
+Manual/unsupported provider accounts are first-class records.
+
+### Balance_Snapshots
+
+Stable snapshot key:
+`account_id | balance_as_of | source_type`
+
+Required provenance:
+- `source_as_of`
+- `observed_at`
+
+Mode: `append_snapshot`
+
+Definitions:
+- `source_as_of`: timestamp/date supplied or implied by the source observation;
+- `observed_at`: timestamp when the warehouse sync observed the record.
+
+Append a new snapshot only if the snapshot identity is new or a new observation is materially meaningful under the source contract.
+
+Never overwrite prior observations.
+
+a disconnected/erroring source:
+- preserve last-known balances;
+- mark connector state separately;
+- never replace stale known balances with zero/null because login is required.
+
+### Investment_Holdings
+
+Stable snapshot key:
+`account_id | security_id | snapshot_as_of`
+
+Required:
+- `snapshot_as_of`
+- `observed_at`
+
+Mode: `append_snapshot`
+
+Treat holdings as point-in-time facts.
+
+Do not delete prior position snapshots when a position disappears from a later current snapshot.
+
+If no source security ID exists, use a clearly documented deterministic fallback and mark it as fallback identity.
+
+### Liabilities
+
+Stable snapshot key:
+`account_id | snapshot_as_of`
+
+Required:
+- `source_as_of`
+- `observed_at`
+
+Mode: `append_snapshot`
+
+Append when material liability fields change, including APR, balance/statement, payment, due date, rate, escrow, or loan metadata.
+
+Preserve old observations.
+
+### Asset_Snapshots
+
+Stable snapshot key:
+`memory_id | snapshot_as_of`
+
+Required:
+- `memory_id`
+- `source_as_of`
+- `observed_at`
+
+Mode: `append_snapshot`
+
+Manual assets and debts are authoritative warehouse inputs and must not be erased by provider-only refreshes.
+
+## Snapshot deduplication
+
+Do not create meaningless repeated snapshots merely because a sync ran again.
+
+Before appending, compare the latest row for the same logical entity/source.
+
+Append when:
+- source timestamp changed; or
+- material value changed; or
+- relevant status/freshness/provenance changed; or
+- the source contract specifically requires recording a new observation.
+
+Otherwise count it as unchanged.
+
+## Timestamp precedence
+
+When incoming and stored representations differ:
+
+1. preserve the most precise valid timestamp;
+2. normalize for equality comparison before diffing;
+3. do not overwrite timestamp-with-time with date-only unless the source explicitly corrected it;
+4. `observed_at` is never a substitute for `source_as_of`.
+
+
+## Backward-compatible v2.4 column migration
+
+This version keeps the warehouse schema family at `v2` and adds nullable columns non-destructively.
+
+For existing warehouses, preflight may append these missing columns:
+
+`Recurring_Streams`:
+- `normalized_average_amount`
+- `normalized_last_amount`
+- `cash_flow_normalization_status`
+
+`Liabilities`:
+- `liability_record_type`
+- `liability_coverage_status`
+- `linked_asset_id`
+- `linked_asset_memory_id`
+
+Rules:
+- append columns only;
+- never clear or reorder existing data;
+- preserve raw recurring amounts;
+- backfill normalized recurring values only when direction is unambiguous;
+- classify existing structured liability rows as `structured`;
+- classify existing manual liability rows as `manual`;
+- create balance-only fallback liability rows only through normal reconciliation using authoritative account balances.
+
+Record this migration in the run audit/completion report.
+
+## Write order
+
+Use:
+
+1. `Sources`
+2. `Accounts`
+3. `Transactions`
+4. `Investment_Transactions`
+5. `Recurring_Streams`
+6. `Balance_Snapshots`
+7. `Investment_Holdings`
+8. `Liabilities`
+9. `Asset_Snapshots`
+10. verify all written datasets
+11. advance `Sync_State`
+12. finalize `Sync_Runs`
+
+## Checkpoint semantics
+
+`last_successful_sync` advances only after:
+
+- write completed;
+- destination reread succeeded;
+- stable keys remain unique;
+- inserted/updated counts match the plan;
+- append-only sheet row count did not decrease;
+- known historical sentinels still exist.
+
+Do not advance a failed or partial dataset.
+
+`last_full_reconcile` advances only after a successful full reconciliation.
+
+## Full reconciliation
+
+A full reconciliation is **non-destructive**.
+
+Use it:
+- weekly or monthly;
+- after relink/repair;
+- after schema migration;
+- when source coverage/counts look suspicious.
+
+For event history:
+- retrieve the full currently available history in bounded slices;
+- upsert all stable IDs;
+- preserve previously captured rows that are no longer inside the provider's returned history.
+
+For snapshot tables:
+- append only genuinely new observations;
+- never reconstruct fake historical snapshots from a current value.
+
+For current-state tables:
+- upsert current state;
+- use status fields for missing/not-returned records where appropriate;
+- do not clear-first.
+
+
+### Versioning contract
+
+Version the warehouse schema and the sync implementation independently.
+
+- `warehouse_schema_version` / `Sync_State.schema_version` = `v2`
+- current `skill_version` = `v2.8-portable`
+
+A skill-version change does not imply a warehouse schema migration.
+A warehouse schema version changes only when the physical/control-table contract changes incompatibly or requires a real schema migration.
+
+Historical `Sync_Runs.skill_version` values must be preserved exactly as run-time facts.
+
+## Sync_Runs requirements
+
+Append one row per dataset per run with:
+
+- `run_id`
+- `started_at`
+- `completed_at`
+- `mode`
+- `status`
+- `dataset`
+- `rows_read`
+- `rows_inserted`
+- `rows_updated`
+- `rows_unchanged`
+- `rows_marked_stale_or_inactive`
+- `error_summary`
+- `checkpoint`
+- `preflight_status`
+- `source_key_duplicates`
+- `destination_key_duplicates`
+- `skill_version`
+- `lock_expires_at`
+- `diff_hash`
+- `warehouse_schema_version`
+- `material_changed_fields`
+
+Version fields:
+- `skill_version` records the exact sync-skill version that executed the run.
+- `warehouse_schema_version` records the warehouse schema contract used by that run.
+
+Statuses:
+- `started`
+- `success`
+- `partial`
+- `failed`
+
+A retry should produce a new run record, not rewrite the prior audit record except to finalize its status.
+
+
+### Portable preservation sentinels
+
+Verification is data-driven, not institution-specific.
+
+For every run:
+- identify all pre-existing disconnected/erroring sources with last-known snapshots and verify those snapshots remain;
+- identify all pre-existing manual or unsupported-provider accounts and verify they remain unless the user explicitly removed them;
+- identify all pre-existing manual asset/debt snapshots and verify they remain unless superseded by a newer explicit manual snapshot;
+- never require a particular bank, broker, insurer, mortgage company, employer, or account name to exist.
+
+A newly initialized setup-created warehouse may legitimately contain none of these categories.
+
+## Verification
+
+After every dataset write:
+
+- reread affected stable-key columns;
+- confirm no duplicates;
+- confirm expected insert/update count;
+- confirm known historical records remain;
+- confirm snapshot table row count never decreased;
+- confirm disconnected/erroring source last-known balances remain when connector is unhealthy;
+- confirm all existing manual/unsupported-provider account and asset rows remain;
+- verify no `legacy_unkeyed` recurring rows remain after a successful legacy migration.
+- confirm representative inserted and updated numeric and boolean cells retain their required effective cell types.
+
+## Hard prohibitions
+
+Never:
+- change a destination after its lock was established without restarting readiness and receiving a new final write confirmation;
+- initialize or write financial facts before source-completeness preflight succeeds;
+- write an available subset of pages or slices when another required source response is unavailable for row-level parsing;
+- clear the workbook;
+- clear `Recurring_Streams` before rewriting it;
+- truncate historical snapshot sheets;
+- silently invent a replacement identity for a missing provider key;
+- interpret connector failure as zero;
+- delete history because a current source response is shorter;
+- overwrite manual data with provider absence;
+- advance checkpoints before verification;
+- continue writing after a schema/key/source-completeness preflight failure.
+
+## Required safety acceptance checks
+
+Before treating this skill version as ready, validate these observable outcomes:
+
+1. When a user selects or mentions a second spreadsheet link after readiness, the run retains the original destination lock. When the user explicitly requests that second link, the skill performs fresh parent verification, a fresh readiness report, and requires a new final confirmation before any write.
+2. When an initial transaction or investment-transaction range is a session-unreadable temporary CSV/download, the run splits the range and writes nothing until every resulting leaf is directly readable and complete.
+3. When an interval reaches one calendar day and every supported account-filtered request remains unreadable or cannot be proved complete, the run records failure without writing financial rows or advancing checkpoints. On an empty first-run workbook, it leaves the workbook uninitialized.
+4. Overlap records from adjacent ranges are deduplicated by stable key only when normalized content is identical; a conflicting duplicate fails preflight.
+5. When every required adaptive leaf is row-readable and complete, the complete normalized sets and all dry-run diffs are available before the first financial write.
+
+## Completion report
+
+Report:
+- run ID;
+- mode;
+- preflight result;
+- per-dataset inserts/updates/unchanged;
+- stale/inactive markings;
+- connector warnings;
+- migration counts if legacy migration occurred;
+- whether disconnected/erroring source stale snapshots were preserved;
+- whether full reconciliation is recommended.
+
+## Idempotency acceptance test
+
+After any successful full reconciliation, run an immediate delta reconciliation as an acceptance test.
+
+Expected result when the source has not materially changed:
+- 0 new event rows;
+- 0 material updates on stable event/current-state rows;
+- 0 new snapshots unless the source emitted a genuinely new as-of/value/status observation;
+- overwhelmingly `unchanged` results.
+
+If the immediate rerun produces material updates:
+1. do not silently call the sync healthy;
+2. identify the exact changed field names;
+3. verify those fields are not sync-generated metadata;
+4. verify timestamp/null/JSON normalization;
+5. flag the dataset for investigation if the cause is not an actual source change.
+
+A full reconcile followed by an immediate near-no-op delta is the production-readiness acceptance criterion.
+
+
+## Share/install behavior
+
+This portable skill is intended to work without source-code edits.
+
+A new user should:
+1. run Personal CFO Setup in the desktop app to create or identify the top-level household folder, its `Transactional Data` subfolder, and the spreadsheet;
+2. open ChatGPT on the web, connect/authorize Finances and Google Drive, and wait for Finances to finish syncing;
+3. upload and run this skill in the web app;
+4. provide the Personal CFO folder or spreadsheet link when asked;
+5. let the first run initialize the selected sheet and perform a full reconciliation;
+6. use delta reconciliation for normal follow-up runs.
+
+If the user already has a canonical warehouse, provide or persist its spreadsheet ID as runtime configuration when possible.
+
+
+Completion reporting must include:
+- `debt_accounts_total`
+- `debt_accounts_with_structured_liabilities`
+- `debt_accounts_with_balance_only_fallback`
+- `debt_accounts_without_liability_rows`
+- recurring streams normalized
+- recurring streams with ambiguous cash-flow normalization
