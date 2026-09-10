@@ -128,7 +128,7 @@ Offer two paths: work through the categories together now, or let the user use t
 
 ## Ongoing use
 
-Explain the system in one short paragraph: the private record lives in the user's Drive; connected Finances data is synced into it from ChatGPT on the web; and the other Personal CFO tools automatically look for `Personal CFO Home` when a new chat does not already identify the folder. Recommend an initial Lifestyle Review next. Mention that Lifestyle Review will offer optional ongoing data-refresh setup after it has established household context; do not introduce that decision during Setup.
+Explain the system in one short paragraph: the private record lives in the user's Drive; connected Finances data is synced into it from ChatGPT on the web; and the other Personal CFO tools automatically look for `Personal CFO Home` when a new chat does not already identify the folder. Then give this specific next step: “Run an initial Personal CFO Lifestyle Review to establish your household context. First install **Personal CFO Lifestyle Review** from the Personal CFO marketplace if it is not already installed. In the desktop app, start a new task, type `@Personal CFO`, select **Personal CFO Lifestyle Review**, and send: `Review the lifestyle patterns in my Personal CFO transactions.` On ChatGPT on the web, start a new chat, type `/` or `@`, select **Personal CFO Lifestyle Review**, and send the same message.” Explain that Lifestyle Review can offer optional ongoing data-refresh setup only after it has established household context; do not introduce that decision during Setup.
 
 ## Safety boundaries
 
