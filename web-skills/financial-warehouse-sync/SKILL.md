@@ -33,7 +33,13 @@ If Finances is not connected, has not finished syncing, or cannot return a read-
 
 ## Resolve the setup-created location
 
-Prefer a folder or spreadsheet link supplied in the current chat. Otherwise, look for the exact native Google Doc `Personal CFO Home` in the selected household folder and read its active-folder location. Treat that top-level folder as the only scope for uploaded files and supporting documents. Resolve its exact `Transactional Data` subfolder as the only scope for the warehouse. Do not search globally for similarly named folders.
+At the start of a new run, a folder or spreadsheet link supplied in the current chat may be a destination candidate. Otherwise, look for the exact native Google Doc `Personal CFO Home` in the selected household folder and read its active-folder location. Treat that top-level folder as the only scope for uploaded files and supporting documents. Resolve its exact `Transactional Data` subfolder as the only scope for the warehouse. Do not search globally for similarly named folders.
+
+### Destination lock
+
+Before the readiness report or any initialization, resolve one exact native Google Sheet and verify that it is active and has the resolved `Transactional Data` folder as its direct parent. Record its spreadsheet ID, URL, top-level folder ID, and `Transactional Data` folder ID as this run's **destination lock**. The readiness report and final write confirmation apply only to that lock.
+
+After a destination lock exists, a later file attachment, `@` mention, title match, or link must never switch the run's destination. If the user explicitly asks to use a different spreadsheet, stop the current run before mutation. Resolve that exact Sheet from scratch, verify its parent folder and active status, create a new destination lock, show the newly resolved location in plain language, and require a new final write confirmation. If it is outside the resolved `Transactional Data` folder, inaccessible, trashed, or ambiguous, do not initialize or write it.
 
 ## Canonical destination
 
@@ -43,7 +49,7 @@ Spreadsheet URL:
 `https://docs.google.com/spreadsheets/d//edit`
 
 Expected warehouse schema version: `v2`.
-Current sync skill version: `v2.6-portable`.
+Current sync skill version: `v2.7-portable`.
 
 Never create a replacement workbook during a normal sync.
 Never accept a trashed warehouse as canonical.
@@ -314,7 +320,7 @@ For a new warehouse:
 - `last_successful_sync` starts blank;
 - `last_full_reconcile` starts blank;
 - `schema_version` is `v2`;
-- `skill_version` is `v2.6-portable`.
+- `skill_version` is `v2.7-portable`.
 - `checkpoint` starts blank.
 
 ### Initialize Sync_Runs
@@ -353,10 +359,10 @@ Reason:
 - there is no prior snapshot state.
 
 The first full reconciliation uses the normal safety contract:
-- retrieve all currently available history in bounded slices;
+- prove that every required source page and bounded history slice is row-readable before initializing or writing financial facts;
 - preserve manual memories as first-class inputs;
 - preserve stale-but-known connector snapshots;
-- compute a dry-run diff;
+- compute every dry-run diff;
 - write in canonical order;
 - verify all stable keys;
 - only then advance checkpoints.
@@ -370,11 +376,9 @@ If warehouse creation succeeds but schema initialization fails:
 - report the partially initialized spreadsheet;
 - do not write financial facts into an incomplete schema.
 
-If financial-data synchronization fails after schema initialization:
-- keep the initialized warehouse;
-- keep successful dataset writes/checkpoints according to normal partial-run semantics;
-- record failures in `Sync_Runs`;
-- do not create another warehouse on retry.
+If source-completeness preflight fails for a first run, do not initialize the workbook or write financial facts. Report the failure in chat; when an already initialized warehouse has a usable `Sync_Runs` tab, append only its failed audit row. Do not create another warehouse on retry.
+
+If a later failure occurs after schema initialization and after source-completeness preflight, preserve prior successful history and checkpoints, record the failure in `Sync_Runs`, and do not create another warehouse on retry. Do not treat a workbook containing a failed first-run partial import as ready: require the user to restore it to its pre-run state or choose an explicit recovery workflow before attempting a clean first sync. Never clear or repair such rows automatically.
 
 ### Post-initialization idempotency
 
@@ -420,17 +424,40 @@ Every run has four phases:
 3. **Dry-run diff**
 4. **Write + verify + checkpoint**
 
-A dataset MUST NOT be written if its preflight fails.
+A dataset MUST NOT be written if its preflight fails. Before the first financial-data mutation in any run, every required source dataset and page must pass source-completeness preflight.
 
 ## Phase 1 — Preflight
 
-Read these before fetching/writing facts:
+Run preflight in this order: destination-lock validation, source-completeness preflight, then schema and existing-key validation. An empty first-run workbook therefore reaches schema initialization only after source-completeness preflight succeeds.
+
+After destination-lock and source-completeness preflight pass, read these before fetching/writing facts:
 
 - spreadsheet metadata and sheet names;
 - `Metadata`;
 - `Sync_State`;
 - recent `Sync_Runs`;
 - headers of every target dataset.
+
+### Destination-lock validation
+
+Before each initialization or write phase, re-read the locked spreadsheet ID and verify that its URL, active status, and direct parent still match the lock. Use only that ID for every subsequent read and write in this run. A title match, Drive search result, attached resource, or another URL is never a substitute for the lock.
+
+### Source-completeness preflight
+
+Before schema initialization, `Sync_Runs` started records, dry-run diffs, or financial-data writes, enumerate every required source request: each bounded transaction-history slice/page, investment-transaction slice/page, recurring-stream response, and relevant accounts, balances, holdings, liabilities, and manual-memory responses. Retrieve enough metadata or payload to prove that every required response is row-readable in the current session.
+
+A temporary CSV attachment, download reference, or other response that is unavailable for row-level parsing is a **source-completeness failure**. A connector that is already errored may remain a documented coverage gap when its last-known data is preserved; a missing page from an otherwise available dataset is not a coverage gap that permits a partial import.
+
+When source-completeness preflight fails:
+
+- do not initialize an empty first-run workbook;
+- do not append a `started` record;
+- do not write or update any financial dataset, including `Sources` and `Accounts`;
+- leave every checkpoint unchanged;
+- append only one `failed` `Sync_Runs` audit row when the existing initialized warehouse supports that safe append; otherwise report the failure in chat; and
+- state the unavailable response and that zero financial rows were written.
+
+Proceed to normalization only after every required response is available for row-level parsing.
 
 ### Schema validation
 
@@ -463,7 +490,7 @@ If an active lock exists, do not start a competing write.
 
 If an old lock is clearly expired, mark that prior run failed/abandoned before proceeding.
 
-Append a `started` record for each dataset before its first mutation.
+Only after destination-lock and source-completeness preflight pass, append a `started` record for each dataset before its first mutation.
 
 ## Phase 2 — Read and normalize source data
 
@@ -483,11 +510,11 @@ For `Transactions`, `Investment_Transactions`, and `Recurring_Streams`, a CSV re
 
 For each CSV-derived dataset:
 
-1. Read the complete CSV payload or its bounded pages; retain provider IDs exactly as strings.
+1. Read the complete CSV payload and every bounded page before computing a diff or writing any row; retain provider IDs exactly as strings.
 2. Parse quoted fields, embedded commas, blank values, dates, timestamps, booleans, and numeric values correctly. Do not use a line split that corrupts quoted CSV fields.
 3. Map each source field to the exact destination header. Preserve the unmodified source record in `raw_json` when that column exists.
 4. Reject only the malformed rows whose stable key is blank or duplicated, record their count and reason in `Sync_Runs`, and continue with valid rows when the source coverage remains usable.
-5. Upsert every valid parsed row by its stable key. Re-read the written keys and verify the inserted/updated counts before advancing the checkpoint.
+5. Hold the complete normalized source set in memory for the run, then compute its diff. Do not write a partial set merely because earlier pages were available. Re-read the written keys and verify the inserted/updated counts before advancing the checkpoint.
 
 It is never acceptable to report “retrieved as CSV but not imported” as a `partial` success for an otherwise readable dataset. If row-level parsing or writing cannot be completed, mark that dataset `failed`, leave its checkpoint unchanged, and state the concrete blocker. Do not claim the first full reconciliation succeeded while any of these three datasets is missing.
 
@@ -546,7 +573,7 @@ This is especially important for `Investment_Transactions` and `Transactions`.
 
 ## Phase 3 — Dry-run diff
 
-No dataset is written until a diff is computed.
+No dataset is written until every required source response has passed source-completeness preflight and every dataset's diff is computed from its complete normalized source set.
 
 For every dataset compute:
 
@@ -872,7 +899,7 @@ For current-state tables:
 Version the warehouse schema and the sync implementation independently.
 
 - `warehouse_schema_version` / `Sync_State.schema_version` = `v2`
-- current `skill_version` = `v2.6-portable`
+- current `skill_version` = `v2.7-portable`
 
 A skill-version change does not imply a warehouse schema migration.
 A warehouse schema version changes only when the physical/control-table contract changes incompatibly or requires a real schema migration.
@@ -947,6 +974,9 @@ After every dataset write:
 ## Hard prohibitions
 
 Never:
+- change a destination after its lock was established without restarting readiness and receiving a new final write confirmation;
+- initialize or write financial facts before source-completeness preflight succeeds;
+- write an available subset of pages or slices when another required source response is unavailable for row-level parsing;
 - clear the workbook;
 - clear `Recurring_Streams` before rewriting it;
 - truncate historical snapshot sheets;
@@ -955,7 +985,15 @@ Never:
 - delete history because a current source response is shorter;
 - overwrite manual data with provider absence;
 - advance checkpoints before verification;
-- continue writing after a schema/key preflight failure.
+- continue writing after a schema/key/source-completeness preflight failure.
+
+## Required safety acceptance checks
+
+Before treating this skill version as ready, validate these observable outcomes:
+
+1. When a user mentions or attaches a second spreadsheet after readiness, the run retains the original destination lock. When the user explicitly requests that second sheet, the skill performs fresh parent verification, a fresh readiness report, and requires a new final confirmation before any write.
+2. When any required transaction or investment-transaction page is a session-unreadable temporary CSV attachment, the run records failure without writing financial rows or advancing checkpoints. On an empty first-run workbook, it leaves the workbook uninitialized.
+3. When every required page is row-readable, the complete normalized sets and all dry-run diffs are available before the first financial write.
 
 ## Completion report
 
