@@ -44,7 +44,7 @@ Plugin availability depends on your plan, workspace settings, and which features
 4. In the **Git ref** field, enter:
 
    ```text
-   codex/personal-cfo-distribution
+   main
    ```
 
 5. Add the marketplace. A new **Personal CFO** marketplace will appear in your Plugins list.
@@ -123,7 +123,7 @@ Always review anything important before acting on it. Financial data can be inco
 
 ## For the publisher or technical tester only
 
-Before sharing the marketplace address, commit and push this repository to the Git ref named in the user instructions. The address reads files from GitHub, not from your computer.
+Before sharing the marketplace address, commit and push this repository to `main`. The address reads files from GitHub, not from your computer.
 
 This repository is a Codex marketplace. To test it from a local checkout:
 
