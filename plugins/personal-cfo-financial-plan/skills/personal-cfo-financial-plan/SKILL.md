@@ -99,6 +99,7 @@ You alone synthesize. Reconcile the returned briefs:
 - **Rank against the agreed goal priority**, not the request order.
 - **Net the briefs in the shared cash-flow/reserve currency** so competing moves (pay down debt vs. fund a goal vs. hold a tax reserve vs. buy protection) can be compared on one axis.
 - Run an explicit **dependency check** for each recommendation: is it independent, or must it be implemented together with another? State the answer; do not assume it.
+- **Route every straddle item.** Some facts belong to more than one module (for example, cash-value life and annuities — Risk owns the policy mechanics while Benefits records the savings/income fact; an HSA — Benefits owns the account, Risk the paired plan, Tax the treatment; beneficiaries — Benefits confirms what is on file, Estate owns the estate effect). Each specialist names these in its "Coordinate with" section. Confirm the module that owns each facet holds it and that the modules that also catch it received the handoff. A recognized straddle item with an unrouted facet is a plan gap — log it like an incomplete-information task, not a silent omission.
 - **Preserve live tradeoffs** — surface the conflict and let the informed household decide. Do not optimize a tradeoff away, and record any override.
 - Keep facts, user-confirmed assumptions, and unknowns visibly distinct. Carry each incorporated element’s evidence date, assumption, rationale, and the household’s decision, so the plan is auditable.
 
